@@ -63,6 +63,16 @@ function App() {
                 setWebcamOn(false);
                 setMicOn(false);
                 setMeetingStarted(false);
+                
+                // Clean up any Tawk.to elements that might be present
+                const tawkContainer = document.getElementById('tawk_6616a163a0c6737bd12a56c8');
+                if (tawkContainer) {
+                  tawkContainer.remove();
+                }
+                
+                // Remove any Tawk.to scripts
+                const tawkScripts = document.querySelectorAll('script[src*="tawk.to"]');
+                tawkScripts.forEach(script => script.remove());
               }}
               setIsMeetingLeft={setIsMeetingLeft}
             />

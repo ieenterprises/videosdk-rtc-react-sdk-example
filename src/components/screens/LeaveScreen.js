@@ -9,7 +9,7 @@ export function LeaveScreen({ setIsMeetingLeft }) {
             setIsMeetingLeft(false);
           }}
         >
-          Rejoin the Meeting
+          End or Rejoin Meeting
         </button>
       </div>
     </div>
