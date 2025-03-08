@@ -6,97 +6,177 @@ import { formatAMPM, json_verify, nameTructed } from "../../utils/helper";
 const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
   const mMeeting = useMeeting();
   const localParticipantId = mMeeting?.localParticipant?.id;
-  const localSender = localParticipantId === senderId;
+  const localSent = localParticipantId === senderId;
+
+  // Check if the message contains a file attachment
+  let messageText = text;
+  let fileAttachment = null;
+
+  try {
+    // Try to parse the message as JSON (for messages with attachments)
+    const parsedMessage = JSON.parse(text);
+    if (parsedMessage.fileAttachment) {
+      messageText = parsedMessage.text || '';
+      fileAttachment = parsedMessage.fileAttachment;
+    }
+  } catch (e) {
+    // Not a JSON message, treat as plain text
+    messageText = text;
+  }
+
+  const handleFileDownload = (fileData) => {
+    const link = document.createElement('a');
+    link.href = fileData.data;
+    link.download = fileData.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div
-      className={`flex ${localSender ? "justify-end" : "justify-start"} mt-4`}
-      style={{
-        maxWidth: "100%",
-      }}
+      className={`flex ${
+        localSent ? "justify-end" : "justify-start"
+      } mt-4 flex-col ${
+        localSent ? "items-end" : "items-start"
+      } text-sm overflow-hidden`}
     >
-      <div
-        className={`flex ${
-          localSender ? "items-end" : "items-start"
-        } flex-col py-1 px-2 rounded-md bg-gray-700`}
-      >
-        <p style={{ color: "#ffffff80" }}>
-          {localSender ? "You" : nameTructed(senderName, 15)}
+      <div>
+        <div
+          className={`${
+            localSent ? "bg-indigo-600" : "bg-zinc-700"
+          } ${localSent ? "text-white" : "text-white"} ${
+            localSent ? "rounded-tr-none" : "rounded-tl-none"
+          } w-fit max-w-[256px] px-3 py-2 rounded-xl inline-block break-words`}
+        >
+          {messageText && <p className="mb-2">{messageText}</p>}
+
+          {fileAttachment && (
+            <div 
+              className="flex items-center gap-2 p-2 bg-gray-800 rounded cursor-pointer hover:bg-gray-700"
+              onClick={() => handleFileDownload(fileAttachment)}
+            >
+              <span className="material-icons text-sm">attachment</span>
+              <div className="overflow-hidden">
+                <p className="text-xs font-medium truncate">{fileAttachment.name}</p>
+                <p className="text-xs text-gray-300">
+                  {Math.round(fileAttachment.size / 1024)} KB
+                </p>
+              </div>
+              <span className="material-icons text-sm ml-auto">download</span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className={`flex ${localSent ? "justify-start" : "justify-end"}`}>
+        <p className="text-xs text-gray-300 px-2 pt-1 w-fit max-w-[256px]">
+          {`${localSent ? "You" : senderName} • ${new Date(
+            timestamp
+          ).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}`}
         </p>
-        <div>
-          <p className="inline-block whitespace-pre-wrap break-words text-right text-white">
-            {text}
-          </p>
-        </div>
-        <div className="mt-1">
-          <p className="text-xs italic" style={{ color: "#ffffff80" }}>
-            {formatAMPM(new Date(timestamp))}
-          </p>
-        </div>
       </div>
     </div>
   );
 };
 
 const ChatInput = ({ inputHeight }) => {
-  const [message, setMessage] = useState("");
   const { publish } = usePubSub("CHAT");
-  const input = useRef();
+  const [message, setMessage] = useState("");
+  const [file, setFile] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    if (e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (message.length > 0 || file) {
+      if (file) {
+        // Convert file to base64 for sending
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fileData = {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            data: e.target.result
+          };
+
+          // Send message with file attachment
+          publish(JSON.stringify({
+            text: message,
+            fileAttachment: fileData
+          }), { persist: true });
+
+          setMessage("");
+          setFile(null);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // Send text-only message
+        publish(message, { persist: true });
+        setMessage("");
+      }
+    }
+  };
 
   return (
     <div
-      className="w-full flex items-center px-2"
       style={{ height: inputHeight }}
+      className="w-full bg-gray-750 px-4 py-4"
     >
-      <div class="relative  w-full">
-        <span class="absolute inset-y-0 right-0 flex mr-2 rotate-90 ">
-          <button
-            disabled={message.length < 2}
-            type="submit"
-            className="p-1 focus:outline-none focus:shadow-outline"
-            onClick={() => {
-              const messageText = message.trim();
-              if (messageText.length > 0) {
-                publish(messageText, { persist: true });
-                setTimeout(() => {
-                  setMessage("");
-                }, 100);
-                input.current?.focus();
-              }
-            }}
+      {file && (
+        <div className="mb-2 p-2 bg-gray-700 rounded-md flex items-center justify-between">
+          <span className="text-white text-sm truncate">{file.name}</span>
+          <button 
+            className="text-gray-400 hover:text-white"
+            onClick={() => setFile(null)}
           >
-            <PaperAirplaneIcon
-              className={`w-6 h-6 ${
-                message.length < 2 ? "text-gray-500 " : "text-white"
-              }`}
-            />
+            <span className="material-icons text-sm">close</span>
           </button>
-        </span>
+        </div>
+      )}
+      <div className="flex">
         <input
-          type="text"
-          className="py-4 text-base text-white border-gray-400 border bg-gray-750 rounded pr-10 pl-2 focus:outline-none w-full"
+          autoComplete="off"
+          id="chatTextArea"
+          className="flex-grow bg-gray-750 border-gray-600 border-1 p-2 rounded-md text-white"
           placeholder="Write your message"
-          autocomplete="off"
-          ref={input}
           value={message}
           onChange={(e) => {
-            setMessage(e.target.value);
+            const v = e.target.value;
+            setMessage(v);
           }}
           onKeyPress={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              const messageText = message.trim();
-
-              if (messageText.length > 0) {
-                publish(messageText, { persist: true });
-                setTimeout(() => {
-                  setMessage("");
-                }, 100);
-                input.current?.focus();
-              }
+              handleSendMessage();
             }
           }}
         />
+        <button
+          className="mx-2 p-2 text-white bg-gray-750 rounded-md"
+          onClick={() => fileInputRef.current.click()}
+          title="Attach file"
+        >
+          <span className="material-icons">attach_file</span>
+          <input 
+            type="file" 
+            ref={fileInputRef}
+            className="hidden" 
+            onChange={handleFileChange}
+          />
+        </button>
+        <button
+          className="p-2 text-white bg-gray-750 rounded-md"
+          onClick={handleSendMessage}
+        >
+          <span className="material-icons">send</span>
+        </button>
       </div>
     </div>
   );
