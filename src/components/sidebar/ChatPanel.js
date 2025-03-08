@@ -141,11 +141,11 @@ const ChatInput = ({ inputHeight }) => {
           </button>
         </div>
       )}
-      <div className="flex">
+      <div className="flex items-center">
         <input
           autoComplete="off"
           id="chatTextArea"
-          className="flex-grow bg-gray-750 border-gray-600 border-1 p-2 rounded-md text-white"
+          className="flex-grow bg-gray-750 border border-gray-600 p-3 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
           placeholder="Write your message"
           value={message}
           onChange={(e) => {
@@ -159,11 +159,11 @@ const ChatInput = ({ inputHeight }) => {
           }}
         />
         <button
-          className="mx-2 p-2 text-white bg-gray-750 rounded-md"
+          className="mx-2 p-2 text-white bg-gray-600 hover:bg-gray-700 rounded-full flex items-center justify-center w-10 h-10"
           onClick={() => fileInputRef.current.click()}
           title="Attach file"
         >
-          <span className="material-icons">attach_file</span>
+          <i className="material-icons text-xl">attach_file</i>
           <input 
             type="file" 
             ref={fileInputRef}
@@ -172,11 +172,11 @@ const ChatInput = ({ inputHeight }) => {
           />
         </button>
         <button
-          className="p-2 text-white bg-gray-750 rounded-md"
+          className="p-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-full flex items-center justify-center w-10 h-10"
           onClick={handleSendMessage}
           title="Send message"
         >
-          <span className="material-icons">send</span>
+          <i className="material-icons text-xl">send</i>
         </button>
       </div>
     </div>
