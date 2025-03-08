@@ -106,3 +106,191 @@ export const MemoizedParticipantGrid = React.memo(
     );
   }
 );
+import React, { useCallback, useMemo, useRef } from "react";
+import { useParticipant } from "@videosdk.live/react-sdk";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
+import useIsTrackEnabled from "../hooks/useIsTrackEnabled";
+import useIsMobile from "../hooks/useIsMobile";
+import MicOffSmallIcon from "../icons/MicOffSmallIcon";
+import NetworkIcon from "../icons/NetworkIcon";
+import { CornerDisplayName } from "./CornerDisplayName";
+import { ParticipantControls } from "./ParticipantControls";
+
+function ParticipantView({ participantId }) {
+  const { webcamStream, micStream, webcamOn, micOn, isLocal, displayName } =
+    useParticipant(participantId);
+
+  const micRef = useRef(null);
+  const webcamRef = useRef(null);
+
+  const videoStream = useMemo(() => {
+    if (webcamOn && webcamStream) {
+      const mediaStream = new MediaStream();
+      mediaStream.addTrack(webcamStream.track);
+      return mediaStream;
+    }
+  }, [webcamStream, webcamOn]);
+
+  useEffect(() => {
+    if (videoStream && webcamRef.current) {
+      webcamRef.current.srcObject = videoStream;
+      webcamRef.current
+        .play()
+        .catch((error) =>
+          console.error("videoElem.current.play() failed", error)
+        );
+    }
+  }, [videoStream]);
+
+  useEffect(() => {
+    if (micRef.current) {
+      if (micOn && micStream) {
+        const mediaStream = new MediaStream();
+        mediaStream.addTrack(micStream.track);
+
+        micRef.current.srcObject = mediaStream;
+        micRef.current
+          .play()
+          .catch((error) =>
+            console.error("videoElem.current.play() failed", error)
+          );
+      } else {
+        micRef.current.srcObject = null;
+      }
+    }
+  }, [micStream, micOn]);
+
+  return (
+    <div
+      className={`h-full w-full relative overflow-hidden rounded-lg video-cover`}
+    >
+      <div className="absolute top-2 left-2 z-40">
+        <NetworkIcon />
+      </div>
+
+      <audio ref={micRef} autoPlay muted={isLocal} />
+
+      {webcamOn ? (
+        <video
+          className="h-full w-full object-cover rounded-lg"
+          ref={webcamRef}
+          autoPlay
+          playsInline
+          muted={isLocal}
+        />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center bg-gray-750 rounded-lg">
+          <div
+            className={`flex items-center justify-center rounded-full bg-gray-700 text-2xl relative`}
+            style={{ height: "48px", width: "48px" }}
+          >
+            {displayName?.charAt(0).toUpperCase()}
+          </div>
+        </div>
+      )}
+
+      <CornerDisplayName
+        displayName={displayName}
+        micOn={micOn}
+        webcamOn={webcamOn}
+        isLocal={isLocal}
+        participantId={participantId}
+      />
+
+      {!micOn && (
+        <div className="absolute bottom-2 right-2 rounded-full flex items-center justify-center">
+          <MicOffSmallIcon fillColor="white" />
+        </div>
+      )}
+
+      {/* Add participant controls */}
+      <ParticipantControls participantId={participantId} />
+    </div>
+  );
+}
+
+// Memoized Participant View
+const MemoizedParticipantView = React.memo(
+  ParticipantView,
+  (prevProps, nextProps) => {
+    return prevProps.participantId === nextProps.participantId;
+  }
+);
+
+function ParticipantGrid({ participantIds }) {
+  const isMobile = useIsMobile();
+
+  let gridStyles = {};
+  const participantCount = participantIds?.length || 0;
+
+  if (participantCount === 1) {
+    gridStyles = {
+      gridTemplateRows: "1fr",
+      gridTemplateColumns: "1fr",
+    };
+  } else if (participantCount === 2) {
+    gridStyles = {
+      gridTemplateRows: "1fr",
+      gridTemplateColumns: "1fr 1fr",
+    };
+  } else if (participantCount === 3) {
+    gridStyles = {
+      gridTemplateRows: "1fr 1fr",
+      gridTemplateColumns: "1fr 1fr",
+    };
+  } else if (participantCount === 4) {
+    gridStyles = {
+      gridTemplateRows: "1fr 1fr",
+      gridTemplateColumns: "1fr 1fr",
+    };
+  } else if (participantCount === 5 || participantCount === 6) {
+    gridStyles = {
+      gridTemplateRows: "1fr 1fr",
+      gridTemplateColumns: "1fr 1fr 1fr",
+    };
+  } else if (participantCount === 7 || participantCount === 8) {
+    gridStyles = {
+      gridTemplateRows: "1fr 1fr",
+      gridTemplateColumns: "1fr 1fr 1fr 1fr",
+    };
+  } else if (participantCount === 9 || participantCount === 10) {
+    gridStyles = {
+      gridTemplateRows: "1fr 1fr 1fr",
+      gridTemplateColumns: "1fr 1fr 1fr 1fr",
+    };
+  } else if (participantCount >= 11) {
+    gridStyles = {
+      gridTemplateRows: "1fr 1fr 1fr",
+      gridTemplateColumns: "1fr 1fr 1fr 1fr",
+    };
+  }
+
+  return (
+    <div
+      className="grid gap-4 flex-1 h-full"
+      style={{
+        ...gridStyles,
+      }}
+    >
+      {participantIds?.map((participantId) => (
+        <MemoizedParticipantView
+          key={participantId}
+          participantId={participantId}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Memoized ParticipantGrid
+const MemoizedParticipantGrid = React.memo(
+  ParticipantGrid,
+  (prevProps, nextProps) => {
+    return (
+      JSON.stringify(prevProps.participantIds) ===
+      JSON.stringify(nextProps.participantIds)
+    );
+  }
+);
+
+export { MemoizedParticipantGrid, ParticipantView };
