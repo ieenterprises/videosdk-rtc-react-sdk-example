@@ -17,23 +17,6 @@ import DropDownSpeaker from "../DropDownSpeaker";
 import NetworkStats from "../NetworkStats";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { toast } from "react-toastify";
-import VideocamIcon from '../../icons/VideocamIcon';
-import VideocamOffIcon from '../../icons/VideocamOffIcon';
-import MicIcon from '../../icons/MicIcon';
-import SettingsIcon from '../../icons/SettingsIcon';
-
-
-// Placeholder for Header component - needs to be implemented
-const Header = () => {
-  return (
-    <header className="bg-transparent">
-      {/* Add your ieVidMeet logo here */}
-      <div className="text-center py-4">
-        <img src="/ievimeet-logo.png" alt="ieVidMeet Logo" className="h-12"/>
-      </div>
-    </header>
-  );
-};
 
 export function JoiningScreen({
   participantName,
@@ -416,226 +399,154 @@ export function JoiningScreen({
   };
 
   return (
-    <div className="fixed inset-0 bg-white">
-      {/* Header */}
-      <Header />
+    <div className="fixed inset-0">
+      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gray-800">
+        <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16">
+          <div className="container grid  md:grid-flow-col grid-flow-row ">
+            <div className="grid grid-cols-12">
+              <div className="md:col-span-7 2xl:col-span-7 col-span-12">
+                <div className="flex items-center justify-center p-1.5 sm:p-4 lg:p-6">
+                  <div className="relative w-full md:pl-4 sm:pl-10 pl-5  md:pr-4 sm:pr-10 pr-5">
+                    <div className="w-full relative" style={{ height: "55vh" }}>
+                      <video
+                        autoPlay
+                        playsInline
+                        muted
+                        ref={videoPlayerRef}
+                        controls={false}
+                        style={{
+                          backgroundColor: "#1c1c1c",
+                        }}
+                        className={
+                          "rounded-[10px] h-full w-full object-cover flex items-center justify-center flip"
+                        }
+                      />
+                      {!isMobile ? (
+                        <>
+                          <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center">
+                            {!webcamOn ? (
+                              <p className="text-xl xl:text-lg 2xl:text-xl text-white">
+                                The camera is off
+                              </p>
+                            ) : null}
+                          </div>
+                        </>
+                      ) : null}
 
-      <div className="overflow-y-auto pt-16">
-        <div className="flex min-h-screen flex-col">
-          {/* Hero section */}
-          <div className="text-center py-10 px-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              Welcome to <span className="text-purple-600">ie</span><span className="text-blue-600">VidMeet</span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-              An exclusive private video chat platform for code calls
-            </p>
-          </div>
+                      <div className="absolute xl:bottom-6 bottom-4 left-0 right-0">
+                        <div className="container grid grid-flow-col space-x-4 items-center justify-center md:-m-2">
+                          {isMicrophonePermissionAllowed ? (
+                            <ButtonWithTooltip
+                              onClick={_toggleMic}
+                              onState={micOn}
+                              mic={true}
+                              OnIcon={MicOnIcon}
+                              OffIcon={MicOffIcon}
+                            />
+                          ) : (
+                            <MicPermissionDenied />
+                          )}
 
-          <div className="container mx-auto px-4 md:px-8 flex flex-col md:flex-row gap-8 mb-12">
-            {/* Preview section */}
-            <div className="md:w-1/3 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-sm font-bold text-gray-500">CAMERA PREVIEW</p>
-                <div className="flex items-center justiy-center">
-                  <SettingsIcon
-                    className="cursor-pointer text-gray-500 hover:text-purple-600"
-                    onClick={() => {
-                      setDlgDevices(true);
+                          {isCameraPermissionAllowed ? (
+                            <ButtonWithTooltip
+                              onClick={_toggleWebcam}
+                              onState={webcamOn}
+                              mic={false}
+                              OnIcon={WebcamOnIcon}
+                              OffIcon={WebcamOffIcon}
+                            />
+                          ) : (
+                            <CameraPermissionDenied />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {!isMobile && (
+                      <>
+                        <div className="absolute top-2 right-10">
+                          <NetworkStats />
+                        </div>
+
+                        <div className="flex mt-3">
+                          {!isFirefox && (
+                            <>
+                              <DropDown
+                                mics={mics}
+                                changeMic={changeMic}
+                                customAudioStream={customAudioStream}
+                                audioTrack={audioTrack}
+                                micOn={micOn}
+                                didDeviceChange={didDeviceChange}
+                                setDidDeviceChange={setDidDeviceChange}
+                              />
+                              <DropDownSpeaker speakers={speakers} />
+                              <DropDownCam
+                                changeWebcam={changeWebcam}
+                                webcams={webcams}
+                              />
+                            </>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
+                <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
+                  <div className="bg-gray-800 p-4 rounded-lg mb-6 text-center max-w-lg">
+                    <h2 className="text-2xl font-bold text-blue-400 mb-2">Welcome to ieVidMeet</h2>
+                    <p className="text-white mb-3">
+                      Experience seamless video conferencing with crystal-clear audio and HD video quality. 
+                      ieVidMeet connects you with colleagues, friends, and family anywhere in the world.
+                    </p>
+                    <p className="text-gray-300 text-sm">
+                      Featuring real-time screen sharing, chat functionality, and secure meetings - all in one place.
+                    </p>
+                  </div>
+                  
+                  <MeetingDetailsScreen
+                    participantName={participantName}
+                    setParticipantName={setParticipantName}
+                    videoTrack={videoTrack}
+                    setVideoTrack={setVideoTrack}
+                    onClickStartMeeting={onClickStartMeeting}
+                    onClickJoin={async (id) => {
+                      const token = await getToken();
+                      const { meetingId, err } = await validateMeeting({
+                        roomId: id,
+                        token,
+                      });
+                      if (meetingId === id) {
+                        setToken(token);
+                        setMeetingId(id);
+                        onClickStartMeeting();
+                      } else {
+                        toast(`${err}`, {
+                          position: "bottom-left",
+                          autoClose: 4000,
+                          hideProgressBar: true,
+                          closeButton: false,
+                          pauseOnHover: true,
+                          draggable: true,
+                          progress: undefined,
+                          theme: "light",
+                        });
+                      }
+                    }}
+                    _handleOnCreateMeeting={async () => {
+                      const token = await getToken();
+                      const { meetingId, err } = await createMeeting({ token });
+
+                      if (meetingId) {
+                        setToken(token);
+                        setMeetingId(meetingId);
+                      }
+                      return { meetingId: meetingId, err: err };
                     }}
                   />
                 </div>
-              </div>
-              <div
-                className={`overflow-hidden relative rounded-lg aspect-video bg-gray-100 ${
-                  !isCameraPermissionAllowed || !webcamOn
-                    ? "hidden"
-                    : "flex"
-                } items-center justify-center shadow-inner mb-4`}
-                style={{ height: "250px" }}
-              >
-                <video
-                  className="h-full w-full object-cover"
-                  autoPlay
-                  playsInline
-                  muted
-                  ref={videoPlayerRef}
-                />
-
-                <div className="absolute right-2 bottom-2 flex items-center justify-center gap-1">
-                  <NetworkStats />
-                </div>
-              </div>
-              <div
-                className={`overflow-hidden relative rounded-lg aspect-video bg-gray-100 ${
-                  isCameraPermissionAllowed && webcamOn ? "hidden" : "flex"
-                } items-center justify-center shadow-inner mb-4`}
-                style={{ height: "250px" }}
-              >
-                <div className="flex flex-col items-center justify-center">
-                  <div className="h-[40px] w-[40px] rounded-full bg-gray-300 flex justify-center items-center">
-                    <VideocamOffIcon className="fill-gray-600" />
-                  </div>
-                  <p className="text-sm text-gray-500 mt-2">
-                    {isCameraPermissionAllowed
-                      ? "Camera is turned off"
-                      : "Camera permission is required"}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center justify-center gap-4 mt-5">
-                <div
-                  onClick={() => {
-                    const updateWebcam = !webcamOn;
-                    setWebcamOn(updateWebcam);
-                    if (!updateWebcam) {
-                      if (videoTrack) {
-                        if (videoTrack.kind === "video") {
-                          videoTrack.stop();
-                          setVideoTrack(null);
-                          setCustomVideoStream(null);
-                        }
-                      }
-                    } else {
-                      if (
-                        isCameraPermissionAllowed &&
-                        !videoTrack &&
-                        webcams.length
-                      ) {
-                        getVideoTrack({
-                          webcams,
-                          selectedWebcam,
-                          setSelectedWebcam,
-                          setCustomVideoStream,
-                          setVideoTrack,
-                        });
-                      }
-                    }
-                  }}
-                  className={`rounded-full min-w-[54px] h-[54px] ${
-                    webcamOn && isCameraPermissionAllowed
-                      ? "bg-purple-600"
-                      : "bg-gray-200"
-                  } cursor-pointer p-3 hover:opacity-90 transition shadow-md`}
-                >
-                  {webcamOn && isCameraPermissionAllowed ? (
-                    <VideocamIcon
-                      fill="#ffffff"
-                      style={{ color: "#ffffff" }}
-                    />
-                  ) : (
-                    <VideocamOffIcon
-                      fill="#666666"
-                      style={{ color: "#666666" }}
-                    />
-                  )}
-                </div>
-
-                <div
-                  onClick={() => {
-                    const updateMic = !micOn;
-                    setMicOn(updateMic);
-                    if (!updateMic) {
-                      if (audioTrack) {
-                        if (audioTrack.kind === "audio") {
-                          audioTrack.stop();
-                          setAudioTrack(null);
-                          setCustomAudioStream(null);
-                        }
-                      }
-                    } else {
-                      if (
-                        isMicrophonePermissionAllowed &&
-                        !audioTrack &&
-                        mics.length
-                      ) {
-                        getAudioTrack({
-                          mics,
-                          selectedMic,
-                          setSelectedMic,
-                          setCustomAudioStream,
-                          setAudioTrack,
-                        });
-                      }
-                    }
-                  }}
-                  className={`rounded-full min-w-[54px] h-[54px] ${
-                    micOn && isMicrophonePermissionAllowed
-                      ? "bg-purple-600"
-                      : "bg-gray-200" 
-                  } cursor-pointer p-3 hover:opacity-90 transition shadow-md`}
-                >
-                  {micOn && isMicrophonePermissionAllowed ? (
-                    <MicIcon
-                      fill="#ffffff"
-                      style={{ color: "#ffffff" }}
-                    />
-                  ) : (
-                    <MicOffIcon
-                      fill="#666666"
-                      style={{ color: "#666666" }}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Join Meeting section */}
-            <div className="md:w-2/3 bg-white rounded-xl shadow-lg p-8 border border-gray-100 flex flex-col justify-center">
-              <div className="mx-auto max-w-md w-full">
-                <div className="p-4 rounded-lg mb-6 text-center bg-gradient-to-r from-purple-50 to-blue-50 border border-blue-100">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                    Welcome to <span className="text-purple-600">ie</span><span className="text-blue-600">VidMeet</span>
-                  </h2>
-                  <p className="text-gray-700 mb-3">
-                    Experience seamless video conferencing with crystal-clear audio and HD video quality.
-                    Connect with colleagues for professional code calls in a secure environment.
-                  </p>
-                  <p className="text-gray-500 text-sm">
-                    Featuring real-time screen sharing, chat functionality, and end-to-end encryption for your privacy.
-                  </p>
-                </div>
-
-                <MeetingDetailsScreen
-                  participantName={participantName}
-                  setParticipantName={setParticipantName}
-                  videoTrack={videoTrack}
-                  setVideoTrack={setVideoTrack}
-                  onClickStartMeeting={onClickStartMeeting}
-                  onClickJoin={async (id) => {
-                    const token = await getToken();
-                    const { meetingId, err } = await validateMeeting({
-                      roomId: id,
-                      token,
-                    });
-                    if (meetingId === id) {
-                      setToken(token);
-                      setMeetingId(id);
-                      onClickStartMeeting();
-                    } else {
-                      toast(`${err}`, {
-                        position: "bottom-left",
-                        autoClose: 4000,
-                        hideProgressBar: true,
-                        closeButton: false,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "light",
-                      });
-                    }
-                  }}
-                  _handleOnCreateMeeting={async () => {
-                    const token = await getToken();
-                    const { meetingId, err } = await createMeeting({ token });
-
-                    if (meetingId) {
-                      setToken(token);
-                      setMeetingId(meetingId);
-                    }
-                    return { meetingId: meetingId, err: err };
-                  }}
-                />
               </div>
             </div>
           </div>
@@ -660,22 +571,6 @@ export function JoiningScreen({
         title="Mic or webcam not available"
         subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
       />
-      {/* Customer Support Chat */}
-      <div className="fixed bottom-0 left-0 right-0">
-        {/*Start of Tawk.to Script*/}
-        <script type="text/javascript">
-          var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-          (function(){
-            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-            s1.async=true;
-            s1.src='https://embed.tawk.to/6616a163a0c6737bd12a56c8/1hr46cts6';
-            s1.charset='UTF-8';
-            s1.setAttribute('crossorigin','*');
-            s0.parentNode.insertBefore(s1,s0);
-          })();
-        </script>
-        {/*End of Tawk.to Script*/}
-      </div>
     </div>
   );
 }

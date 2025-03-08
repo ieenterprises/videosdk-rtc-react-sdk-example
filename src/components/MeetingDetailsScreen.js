@@ -92,7 +92,7 @@ export function MeetingDetailsScreen({
         <div className="w-full md:mt-0 mt-4 flex flex-col">
           <div className="flex items-center justify-center flex-col w-full ">
             <button
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white px-4 py-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 font-medium text-lg"
+              className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
               onClick={async (e) => {
                 const { meetingId, err } = await _handleOnCreateMeeting();
               
@@ -119,7 +119,7 @@ export function MeetingDetailsScreen({
               Create a meeting
             </button>
             <button
-              className="w-full bg-white border-2 border-gray-300 text-gray-700 px-4 py-4 rounded-xl mt-5 shadow-sm hover:shadow-md transition-all duration-200 font-medium text-lg"
+              className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-5"
               onClick={(e) => {
                 setIsJoinMeetingClicked(true);
               }}

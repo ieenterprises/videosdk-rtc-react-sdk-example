@@ -41,12 +41,13 @@ const WaitingToJoinScreen = () => {
 
   return (
     <div
-      className="bg-white"
+      className="bg-gray-800"
       style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
+        // backgroundColor: theme.palette.darkTheme.main,
       }}
     >
       <div className="flex flex-col">
@@ -67,7 +68,7 @@ const WaitingToJoinScreen = () => {
             style={{ height: "100%", width: "100%" }}
           />
         </div>
-        <h1 className="text-gray-800 text-center font-bold mt-1 text-xl">
+        <h1 className="text-white text-center font-bold mt-1 text-xl">
           {message.text}
         </h1>
       </div>
