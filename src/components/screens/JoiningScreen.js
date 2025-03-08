@@ -581,9 +581,9 @@ export function JoiningScreen({
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
                       </svg>
-                      Create a Meeting
+                      Save Meeting code as it is Temporary
                     </button>
-                    <p className="text-white text-xs text-center mb-3">Save Meeting code as it is Temporary</p>
+                    <p className="text-white text-xs text-center mb-3"></p>
 
                     <button className="w-full border border-gray-300 hover:bg-indigo-700 text-white py-3 rounded-md mb-1">
                       <div className="flex justify-center items-center">
@@ -591,10 +591,10 @@ export function JoiningScreen({
                           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                           <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                         </svg>
-                        Join a Meeting
+                        Save Meeting Link as it is Temporary
                       </div>
                     </button>
-                    <p className="text-white text-xs text-center mb-6">Save Meeting Link as it is Temporary</p>
+                    <p className="text-white text-xs text-center mb-6"></p>
 
                     <div className="bg-indigo-700 bg-opacity-50 rounded-md p-4 text-left">
                       <h3 className="text-white text-sm font-medium mb-2">Quick Start Guide</h3>
