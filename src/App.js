@@ -27,6 +27,13 @@ function App() {
         return "Are you sure you want to exit?";
       };
     }
+    
+    // Check for meetingId in URL params when app loads
+    const urlParams = new URLSearchParams(window.location.search);
+    const meetingIdParam = urlParams.get('meetingId');
+    if (meetingIdParam) {
+      setMeetingId(meetingIdParam);
+    }
   }, [isMobile]);
 
   return (

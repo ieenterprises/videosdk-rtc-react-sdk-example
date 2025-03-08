@@ -20,29 +20,65 @@ export function MeetingDetailsScreen({
       className={`flex flex-1 flex-col justify-center w-full md:p-[6px] sm:p-1 p-1.5`}
     >
       {iscreateMeetingClicked ? (
-        <div className="border border-solid border-gray-400 rounded-xl px-4 py-3  flex items-center justify-center">
-          <p className="text-white text-base">
-            {`Meeting code : ${meetingId}`}
-          </p>
+        <div className="flex flex-col w-full gap-3">
+          <div className="border border-solid border-gray-400 rounded-xl px-4 py-3 bg-white flex items-center justify-center">
+            <p className="text-black text-base font-medium">
+              {`Meeting code: ${meetingId}`}
+            </p>
+            <button
+              className="ml-2"
+              onClick={() => {
+                navigator.clipboard.writeText(meetingId);
+                setIsCopied(true);
+                setTimeout(() => {
+                  setIsCopied(false);
+                }, 3000);
+              }}
+            >
+              {isCopied ? (
+                <CheckIcon className="h-5 w-5 text-green-400" />
+              ) : (
+                <ClipboardIcon className="h-5 w-5 text-gray-700" />
+              )}
+            </button>
+          </div>
+          
+          <div className="border border-solid border-gray-400 rounded-xl px-4 py-3 bg-white flex items-center justify-center">
+            <p className="text-black text-base font-medium">
+              {`Meeting link: ${window.location.origin}?meetingId=${meetingId}`}
+            </p>
+            <button
+              className="ml-2"
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}?meetingId=${meetingId}`);
+                toast("Meeting link copied!", {
+                  position: "bottom-left",
+                  autoClose: 4000,
+                  hideProgressBar: true,
+                  closeButton: false,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "light",
+                });
+              }}
+            >
+              <ClipboardIcon className="h-5 w-5 text-gray-700" />
+            </button>
+          </div>
+          
           <button
-            className="ml-2"
+            className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-2"
             onClick={() => {
-              navigator.clipboard.writeText(meetingId);
-              setIsCopied(true);
-              setTimeout(() => {
-                setIsCopied(false);
-              }, 3000);
+              setIscreateMeetingClicked(false);
+              setMeetingId("");
             }}
           >
-            {isCopied ? (
-              <CheckIcon className="h-5 w-5 text-green-400" />
-            ) : (
-              <ClipboardIcon className="h-5 w-5 text-white" />
-            )}
+            Back to options
           </button>
         </div>
       ) : isJoinMeetingClicked ? (
-        <>
+        <div className="flex flex-col w-full gap-3">
           <input
             defaultValue={meetingId}
             onChange={(e) => {
@@ -54,7 +90,17 @@ export function MeetingDetailsScreen({
           {meetingIdError && (
             <p className="text-xs text-red-600">{`Please enter valid meetingId`}</p>
           )}
-        </>
+          
+          <button
+            className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-2"
+            onClick={() => {
+              setIsJoinMeetingClicked(false);
+              setMeetingId("");
+            }}
+          >
+            Back to options
+          </button>
+        </div>
       ) : null}
 
       {(iscreateMeetingClicked || isJoinMeetingClicked) && (
