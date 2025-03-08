@@ -1,137 +1,18 @@
-import React, { useMemo } from "react";
-import { useParticipant } from "@videosdk.live/react-sdk";
-import { useMeetingAppContext } from "../MeetingAppContextDef";
-import { MicrophoneIcon, VideoCameraIcon, XCircleIcon } from "@heroicons/react/outline";
-
-export const ParticipantView = ({ participantId, showControls = false }) => {
-  const { displayName, webcamStream, micStream, webcamOn, micOn, isLocal } = useParticipant(participantId);
-  const { isHost } = useMeetingAppContext();
-
-  const webcamRef = React.useRef(null);
-  const micRef = useMemo(() => {
-    return typeof micStream?.on === "function" ? React.createRef() : undefined;
-  }, [micStream]);
-
-  useMemo(() => {
-    if (webcamRef.current && webcamStream) {
-      const mediaStream = new MediaStream();
-      mediaStream.addTrack(webcamStream.track);
-      webcamRef.current.srcObject = mediaStream;
-      webcamRef.current.play().catch(error => {
-        console.error("Error playing video:", error);
-      });
-    }
-  }, [webcamStream]);
-
-  React.useEffect(() => {
-    if (micRef && micRef.current) {
-      if (micOn && micStream) {
-        const mediaStream = new MediaStream();
-        mediaStream.addTrack(micStream.track);
-        micRef.current.srcObject = mediaStream;
-        micRef.current
-          .play()
-          .catch((error) => console.error("mic play() failed", error));
-      } else {
-        micRef.current.srcObject = null;
-      }
-    }
-  }, [micStream, micOn, micRef]);
-
-
-  return (
-    <div className="relative h-full w-full overflow-hidden rounded-lg bg-gray-750">
-      {webcamOn ? (
-        <video
-          ref={webcamRef}
-          autoPlay
-          playsInline
-          muted={isLocal}
-          className="h-full w-full object-cover"
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-gray-750 text-white">
-          <span className="text-lg">{displayName || "Participant"}</span>
-        </div>
-      )}
-
-      <div className="absolute bottom-2 left-2 flex items-center space-x-2">
-        <div className={`p-1 rounded-full ${micOn ? "bg-green-500" : "bg-red-500"}`}>
-          <MicrophoneIcon className="h-4 w-4 text-white" />
-        </div>
-        <div className={`p-1 rounded-full ${webcamOn ? "bg-green-500" : "bg-red-500"}`}>
-          <VideoCameraIcon className="h-4 w-4 text-white" />
-        </div>
-      </div>
-
-      {showControls && isHost && (
-        <div className="absolute top-2 right-2 flex space-x-2">
-          <button
-            onClick={() => {
-              const participant = useParticipant(participantId);
-              if (participant && micOn) {
-                participant.disableMic();
-              } else if (participant) {
-                participant.enableMic();
-              }
-            }}
-            className="bg-gray-800 p-1 rounded-full hover:bg-gray-700"
-          >
-            <MicrophoneIcon className="h-5 w-5 text-white" />
-          </button>
-          <button
-            onClick={() => {
-              const participant = useParticipant(participantId);
-              if (participant && webcamOn) {
-                participant.disableWebcam();
-              } else if (participant) {
-                participant.enableWebcam();
-              }
-            }}
-            className="bg-gray-800 p-1 rounded-full hover:bg-gray-700"
-          >
-            <VideoCameraIcon className="h-5 w-5 text-white" />
-          </button>
-          <button
-            onClick={() => {
-              const participant = useParticipant(participantId);
-              if (participant) {
-                participant.remove();
-              }
-            }}
-            className="bg-red-600 p-1 rounded-full hover:bg-red-700"
-          >
-            <XCircleIcon className="h-5 w-5 text-white" />
-          </button>
-        </div>
-      )}
-
-      <div className="absolute bottom-2 right-2 text-xs text-white bg-gray-800 px-2 py-1 rounded-md">
-        {displayName || "Participant"}
-      </div>
-      <audio ref={micRef} autoPlay muted={isLocal} />
-    </div>
-  );
-};
-
-export default ParticipantView;
 import { Popover, Transition } from "@headlessui/react";
-import { XIcon, DotsVerticalIcon } from "@heroicons/react/outline";
+import { XIcon } from "@heroicons/react/outline";
 import { useParticipant } from "@videosdk.live/react-sdk";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import ReactPlayer from "react-player";
-import { useMeetingAppContext } from "../MeetingAppContextDef";
-import MicOffSmallIcon from "../icons/MicOffSmallIcon";
-import NetworkIcon from "../icons/NetworkIcon";
-import { getQualityScore, nameTructed } from "../utils/common";
-import * as ReactDOM from "react-dom";
+import { useMediaQuery } from "react-responsive";
 import useIsMobile from "../hooks/useIsMobile";
 import useIsTab from "../hooks/useIsTab";
 import useWindowSize from "../hooks/useWindowSize";
-import { useMediaQuery } from "react-responsive";
+import MicOffSmallIcon from "../icons/MicOffSmallIcon";
+import NetworkIcon from "../icons/NetworkIcon";
 import SpeakerIcon from "../icons/SpeakerIcon";
-
-
+import { getQualityScore, nameTructed } from "../utils/common";
+import * as ReactDOM from "react-dom";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 export const CornerDisplayName = ({
   participantId,
   isPresenting,
@@ -334,8 +215,7 @@ export const CornerDisplayName = ({
     }
 
     return () => {
-      if (statsIntervalIdRef.current)
-        clearInterval(statsIntervalIdRef.current);
+      if (statsIntervalIdRef.current) clearInterval(statsIntervalIdRef.current);
     };
   }, [webcamStream, micStream, screenShareStream]);
 
@@ -530,3 +410,115 @@ export const CornerDisplayName = ({
     </>
   );
 };
+
+export function ParticipantView({ participantId }) {
+  const {
+    displayName,
+    webcamStream,
+    micStream,
+    webcamOn,
+    micOn,
+    isLocal,
+    mode,
+    isActiveSpeaker,
+  } = useParticipant(participantId);
+
+  const { selectedSpeaker } = useMeetingAppContext();
+  const micRef = useRef(null);
+  const [mouseOver, setMouseOver] = useState(false);
+
+  useEffect(() => {
+    const isFirefox =
+          navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+    if (micRef.current) {
+        try{
+          if (!isFirefox){
+            micRef.current.setSinkId(selectedSpeaker.id);
+          }
+        }catch(err){
+          console.log("Setting speaker device failed", err);
+        }
+      } 
+  }, [ selectedSpeaker]);
+
+  useEffect(() => {
+    if (micRef.current) {
+      if (micOn && micStream) {
+        const mediaStream = new MediaStream();
+        mediaStream.addTrack(micStream.track);
+        micRef.current.srcObject = mediaStream;
+        micRef.current
+          .play()
+          .catch((error) =>
+            console.error("micRef.current.play() failed", error)
+          );
+        }else {
+          micRef.current.srcObject = null;
+        }
+      }
+  }, [micStream, micOn, micRef])
+
+  const webcamMediaStream = useMemo(() => {
+    if (webcamOn && webcamStream) {
+      const mediaStream = new MediaStream();
+      mediaStream.addTrack(webcamStream.track);
+      return mediaStream;
+    }
+  }, [webcamStream, webcamOn]);
+  return mode === "CONFERENCE" ? (
+    <div
+      onMouseEnter={() => {
+        setMouseOver(true);
+      }}
+      onMouseLeave={() => {
+        setMouseOver(false);
+      }}
+      className={`h-full w-full  bg-gray-750 relative overflow-hidden rounded-lg video-cover`}
+    >
+      <audio ref={micRef} autoPlay muted={isLocal} />
+      {webcamOn ? (
+        <ReactPlayer
+          //
+          playsinline // very very imp prop
+          playIcon={<></>}
+          //
+          pip={false}
+          light={false}
+          controls={false}
+          muted={true}
+          playing={true}
+          //
+          url={webcamMediaStream}
+          //
+          height={"100%"}
+          width={"100%"}
+          onError={(err) => {
+            console.log(err, "participant video error");
+          }}
+        />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center">
+          <div
+            className={`z-10 flex items-center justify-center rounded-full bg-gray-800 2xl:h-[92px] h-[52px] 2xl:w-[92px] w-[52px]`}
+          >
+            <p className="text-2xl text-white">
+              {String(displayName).charAt(0).toUpperCase()}
+            </p>
+          </div>
+        </div>
+      )}
+      <CornerDisplayName
+        {...{
+          isLocal,
+          displayName,
+          micOn,
+          webcamOn,
+          isPresenting: false,
+          participantId,
+          mouseOver,
+          isActiveSpeaker,
+        }}
+      />
+    </div>
+  ) : null;
+}
