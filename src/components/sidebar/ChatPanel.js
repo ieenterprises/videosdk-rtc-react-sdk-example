@@ -145,7 +145,7 @@ const ChatInput = ({ inputHeight }) => {
         <input
           autoComplete="off"
           id="chatTextArea"
-          className="flex-grow bg-gray-750 border-gray-600 border-1 p-2 rounded-md text-white"
+          className="flex-grow bg-gray-750 border-2 border-gray-400 p-2 rounded-md text-white" // Added border
           placeholder="Write your message"
           value={message}
           onChange={(e) => {
@@ -163,7 +163,7 @@ const ChatInput = ({ inputHeight }) => {
           onClick={() => fileInputRef.current.click()}
           title="Attach file"
         >
-          <span className="material-icons">attach_file</span>
+          <span className="material-icons">attach_file</span> {/* Replaced text with icon */}
           <input 
             type="file" 
             ref={fileInputRef}
@@ -175,7 +175,7 @@ const ChatInput = ({ inputHeight }) => {
           className="p-2 text-white bg-gray-750 rounded-md"
           onClick={handleSendMessage}
         >
-          <span className="material-icons">send</span>
+          <span className="material-icons">send</span> {/* Replaced text with icon */}
         </button>
       </div>
     </div>
