@@ -163,14 +163,14 @@ const ChatInput = ({ inputHeight }) => {
           onClick={() => fileInputRef.current.click()}
           title="Attach file"
         >
-          <span className="material-icons">attach_file</span> {/* Replaced text with icon */}
+          <span className="material-icons">attach_file</span>
           <input 
             type="file" 
             ref={fileInputRef}
             className="hidden" 
             onChange={handleFileChange}
           />
-        </button>
+        </button>n>
         <button
           className="p-2 text-white bg-gray-750 rounded-md"
           onClick={handleSendMessage}
