@@ -400,11 +400,9 @@ export function JoiningScreen({
 
   return (
     <div className="fixed inset-0">
-      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900">
+      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-white">
         <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16 relative">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxsaW5lIHgxPSIwIiB5PSIwIiB4Mj0iMCIgeTI9IjQwIiBzdHJva2U9IiMzNjNlNTAiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIgb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-20 z-0 pointer-events-none"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-blue-500 opacity-10 blur-3xl -mr-48 -mt-48 pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-indigo-600 opacity-10 blur-3xl -ml-48 -mb-48 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-indigo-800 opacity-5 z-0 pointer-events-none"></div>
           <div className="container grid md:grid-flow-col grid-flow-row relative z-10">
             <div className="grid grid-cols-12">
               <div className="md:col-span-7 2xl:col-span-7 col-span-12">
@@ -498,31 +496,49 @@ export function JoiningScreen({
               </div>
               <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
                 <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
-                  <div className="bg-gray-900 bg-opacity-60 backdrop-filter backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-gray-700 border-opacity-50 mb-6 text-center max-w-lg transform transition-all duration-500 hover:scale-105">
-                    <div className="inline-block p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 mb-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  <div className="bg-indigo-800 p-8 rounded-md shadow-lg mb-6 text-center max-w-lg w-full">
+                    <h2 className="text-3xl font-bold text-white mb-2">Welcome to ieVidMeet</h2>
+                    <p className="text-white text-sm mb-6">
+                      Seamless HD video calls, crystal-clear audio, secure meetings, and real-time collaboration.
+                    </p>
+                    
+                    <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md mb-3 flex justify-center items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
                       </svg>
-                    </div>
-                    <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Welcome to <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">ieVidMeet</span></h2>
-                    <div className="w-16 h-1 bg-gradient-to-r from-blue-400 to-indigo-500 mx-auto mb-4 rounded-full"></div>
-                    <p className="text-gray-200 mb-4 leading-relaxed">
-                      Experience seamless video conferencing with crystal-clear audio and HD video quality. 
-                      ieVidMeet connects you with colleagues, friends, and family anywhere in the world.
-                    </p>
-                    <p className="text-blue-300 text-sm mb-2">
-                      Featuring real-time screen sharing, chat functionality, and secure meetings - all in one place.
-                    </p>
-                    <div className="flex justify-center mt-4 space-x-3">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-900 bg-opacity-50 text-blue-300 text-xs font-medium">
-                        HD Quality
-                      </span>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-900 bg-opacity-50 text-indigo-300 text-xs font-medium">
-                        Secure
-                      </span>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-900 bg-opacity-50 text-purple-300 text-xs font-medium">
-                        Easy to Use
-                      </span>
+                      Create a Meeting
+                    </button>
+                    
+                    <button className="w-full border border-gray-300 hover:bg-indigo-700 text-white py-3 rounded-md mb-6">
+                      <div className="flex justify-center items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                        </svg>
+                        Join a Meeting
+                      </div>
+                    </button>
+                    
+                    <div className="bg-indigo-700 bg-opacity-50 rounded-md p-4 text-left">
+                      <h3 className="text-white text-sm font-medium mb-2">Quick Start Guide</h3>
+                      <div className="flex items-center text-white text-xs mb-2">
+                        <svg className="h-4 w-4 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Test your audio and video
+                      </div>
+                      <div className="flex items-center text-white text-xs mb-2">
+                        <svg className="h-4 w-4 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Share meeting link with participants
+                      </div>
+                      <div className="flex items-center text-white text-xs">
+                        <svg className="h-4 w-4 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Ensure stable internet connection
+                      </div>
                     </div>
                   </div>
 
