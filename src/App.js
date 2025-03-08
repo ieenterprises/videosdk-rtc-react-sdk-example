@@ -6,7 +6,7 @@ import { MeetingContainer } from "./meeting/MeetingContainer";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { JoiningScreen } from "./components/screens/JoiningScreen"
 
-import TawkToChat from './components/TawkToChat';
+import TawkToChat from './components/TawkToChat.js';
 
 function App() {
   const [token, setToken] = useState("");
