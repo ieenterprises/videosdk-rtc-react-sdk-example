@@ -577,14 +577,15 @@ export function JoiningScreen({
                       Seamless HD video calls, crystal-clear audio, secure meetings, and real-time collaboration.
                     </p>
 
-                    <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md mb-3 flex justify-center items-center">
+                    <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md mb-1 flex justify-center items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
                       </svg>
                       Create a Meeting
                     </button>
+                    <p className="text-white text-xs text-center mb-3">Save Meeting code as it is Temporary</p>
 
-                    <button className="w-full border border-gray-300 hover:bg-indigo-700 text-white py-3 rounded-md mb-6">
+                    <button className="w-full border border-gray-300 hover:bg-indigo-700 text-white py-3 rounded-md mb-1">
                       <div className="flex justify-center items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -593,6 +594,7 @@ export function JoiningScreen({
                         Join a Meeting
                       </div>
                     </button>
+                    <p className="text-white text-xs text-center mb-6">Save Meeting Link as it is Temporary</p>
 
                     <div className="bg-indigo-700 bg-opacity-50 rounded-md p-4 text-left">
                       <h3 className="text-white text-sm font-medium mb-2">Quick Start Guide</h3>
