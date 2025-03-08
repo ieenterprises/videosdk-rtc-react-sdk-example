@@ -495,6 +495,17 @@ export function JoiningScreen({
               </div>
               <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
                 <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
+                  <div className="bg-gray-800 p-4 rounded-lg mb-6 text-center max-w-lg">
+                    <h2 className="text-2xl font-bold text-blue-400 mb-2">Welcome to ieVidMeet</h2>
+                    <p className="text-white mb-3">
+                      Experience seamless video conferencing with crystal-clear audio and HD video quality. 
+                      ieVidMeet connects you with colleagues, friends, and family anywhere in the world.
+                    </p>
+                    <p className="text-gray-300 text-sm">
+                      Featuring real-time screen sharing, chat functionality, and secure meetings - all in one place.
+                    </p>
+                  </div>
+                  
                   <MeetingDetailsScreen
                     participantName={participantName}
                     setParticipantName={setParticipantName}
