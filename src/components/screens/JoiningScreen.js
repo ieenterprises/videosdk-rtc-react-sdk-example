@@ -61,6 +61,36 @@ export function JoiningScreen({
     };
   }, []);
 
+  useEffect(() => {
+    const checkDeviceAvailability = async () => {
+      try {
+        if (webcamOn || micOn) {
+          await getDefaultMediaTracks({ webcamOn, micOn });
+        }
+      } catch (error) {
+        console.error("Media device error:", error);
+        toast(`Device error: ${error.message || "Could not access media devices"}`, {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+
+        // Turn off devices if not available
+        if (error.message.includes("Requested device not found")) {
+          if (webcamOn) setWebcamOn(false);
+          if (micOn) setMicOn(false);
+        }
+      }
+    };
+
+    checkDeviceAvailability();
+  }, [webcamOn, micOn]);
+
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Transparent Header with Logo */}
@@ -150,6 +180,7 @@ export function JoiningScreen({
               setVideoTrack={setVideoTrack}
               onClickStartMeeting={onClickStartMeeting}
               onClickJoin={async (id) => {
+                try {
                 const token = await getToken();
                 const { meetingId, err } = await validateMeeting({
                   roomId: id,
@@ -170,8 +201,21 @@ export function JoiningScreen({
                     progress: undefined,
                   });
                 }
+                } catch (error) {
+                  console.error("Meeting join error:", error);
+                  toast(`Error: ${error.message || "Failed to join meeting"}`, {
+                    position: "bottom-left",
+                    autoClose: 4000,
+                    hideProgressBar: true,
+                    closeButton: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+                }
               }}
               _handleOnCreateMeeting={async () => {
+                try {
                 const token = await getToken();
                 const { meetingId, err } = await createMeeting({ token });
 
@@ -180,7 +224,19 @@ export function JoiningScreen({
                   setMeetingId(meetingId);
                   onClickStartMeeting();
                 } else {
-                  toast(`${err}`, {
+                  toast(`${err || "Unknown error occurred"}`, {
+                    position: "bottom-left",
+                    autoClose: 4000,
+                    hideProgressBar: true,
+                    closeButton: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+                }
+                } catch (error) {
+                  console.error("Create meeting error:", error);
+                  toast(`Error: ${error.message || "Failed to create meeting"}`, {
                     position: "bottom-left",
                     autoClose: 4000,
                     hideProgressBar: true,
