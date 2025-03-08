@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
-import WaitingRoom from "./WaitingRoom"; // Assuming WaitingRoom component exists
 
 function ParticipantsViewer({ isPresenting }) {
   const {
@@ -49,10 +48,10 @@ function ParticipantsViewer({ isPresenting }) {
   ]);
 
   return (
-    <div className="h-full w-full">
-      <MemoizedParticipantGrid participantIds={participantIds} />
-      <WaitingRoom />
-    </div>
+    <MemoizedParticipantGrid
+      participantIds={participantIds}
+      isPresenting={isPresenting}
+    />
   );
 }
 

@@ -25,19 +25,19 @@ const TawkToChat = () => {
     const containerDiv = document.createElement('div');
     containerDiv.id = 'tawk_6616a163a0c6737bd12a56c8';
     document.body.appendChild(containerDiv);
-
+    
     // Create and insert Tawk.to script
     var Tawk_API = window.Tawk_API || {};
     var Tawk_LoadStart = new Date();
     Tawk_API.embedded = 'tawk_6616a163a0c6737bd12a56c8';
-
+    
     const script = document.createElement("script");
     script.id = 'tawk-to-script';
     script.async = true;
     script.src = 'https://embed.tawk.to/6616a163a0c6737bd12a56c8/1ilrgsu2o';
     script.charset = 'UTF-8';
     script.setAttribute('crossorigin', '*');
-
+    
     document.body.appendChild(script);
 
     // Clean up function to remove the script and container when component unmounts
@@ -46,22 +46,22 @@ const TawkToChat = () => {
       if(script && script.parentNode) {
         script.parentNode.removeChild(script);
       }
-
+      
       // Remove the container
       if(containerDiv && containerDiv.parentNode) {
         containerDiv.parentNode.removeChild(containerDiv);
       }
-
+      
       // Remove any other Tawk elements that might be present
       const tawkContainer = document.getElementById('tawk_6616a163a0c6737bd12a56c8');
       if (tawkContainer) {
         tawkContainer.remove();
       }
-
+      
       // Remove Tawk iframe and widget elements
       const tawkIframes = document.querySelectorAll('iframe[src*="tawk.to"]');
       tawkIframes.forEach(iframe => iframe.remove());
-
+      
       const tawkWidgets = document.querySelectorAll('.tawk-min-container, .tawk-card');
       tawkWidgets.forEach(widget => widget.remove());
     };
@@ -471,8 +471,6 @@ export function JoiningScreen({
     };
   }, []);
 
-  const meetingAppContext = useMeetingAppContext();
-
   return (
     <div className="fixed inset-0">
       {/* Render the Tawk.to chat component */}
@@ -637,12 +635,6 @@ export function JoiningScreen({
                         setToken(token);
                         setMeetingId(id);
                         onClickStartMeeting();
-
-                        // Check if this user is the original meeting creator
-                        const createdMeetingId = localStorage.getItem('createdMeetingId');
-                        if (createdMeetingId === meetingId && localStorage.getItem('isMeetingCreator') === 'true') {
-                          meetingAppContext.setIsMeetingCreator(true);
-                        }
                       } else {
                         toast(`${err}`, {
                           position: "bottom-left",
@@ -663,12 +655,6 @@ export function JoiningScreen({
                       if (meetingId) {
                         setToken(token);
                         setMeetingId(meetingId);
-                        // Set user as meeting creator
-                        meetingAppContext.setIsMeetingCreator(true);
-
-                        // Store creator info in local storage to persist across refreshes
-                        localStorage.setItem('isMeetingCreator', 'true');
-                        localStorage.setItem('createdMeetingId', meetingId);
                       }
                       return { meetingId: meetingId, err: err };
                     }}

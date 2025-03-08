@@ -13,7 +13,6 @@ export const MeetingAppProvider = ({ children }) => {
   const [raisedHandsParticipants, setRaisedHandsParticipants] = useState([]);
   const [sideBarMode, setSideBarMode] = useState(null);
   const [pipMode, setPipMode] = useState(false);
-  const [isMeetingCreator, setIsMeetingCreator] = useState(false);
 
   const useRaisedHandParticipants = () => {
     const raisedHandsParticipantsRef = useRef();
@@ -78,7 +77,6 @@ export const MeetingAppProvider = ({ children }) => {
         pipMode,
         isCameraPermissionAllowed,
         isMicrophonePermissionAllowed,
-        isMeetingCreator,
 
         // setters
 
@@ -91,7 +89,6 @@ export const MeetingAppProvider = ({ children }) => {
         useRaisedHandParticipants,
         setIsCameraPermissionAllowed,
         setIsMicrophonePermissionAllowed,
-        setIsMeetingCreator,
       }}
     >
       {children}
