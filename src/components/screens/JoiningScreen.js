@@ -399,68 +399,178 @@ export function JoiningScreen({
   };
 
   return (
-    <div
-      className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 min-h-screen flex flex-col items-center justify-center p-4"
-      style={{
-        backgroundImage: "url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=1600&q=80')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundBlend: "overlay",
-      }}
-    >
-      <div className="max-w-4xl w-full bg-black bg-opacity-70 p-8 rounded-xl backdrop-filter backdrop-blur-sm shadow-2xl">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="flex flex-col justify-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Welcome to <span className="text-purple-400">ieVidMeet</span>
-            </h1>
-            <div className="mt-6 space-y-4">
-              <p className="text-white mb-3">
-                Experience seamless video conferencing with crystal-clear audio and HD video quality. 
-                ieVidMeet connects you with colleagues, friends, and family anywhere in the world.
-              </p>
-              <p className="text-gray-300 text-sm">
-                Featuring real-time screen sharing, chat functionality, and secure meetings - all in one place.
-              </p>
+    <div className="fixed inset-0">
+      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gray-800">
+        <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16">
+          <div className="container grid  md:grid-flow-col grid-flow-row ">
+            <div className="grid grid-cols-12">
+              <div className="md:col-span-7 2xl:col-span-7 col-span-12">
+                <div className="flex items-center justify-center p-1.5 sm:p-4 lg:p-6">
+                  <div className="relative w-full md:pl-4 sm:pl-10 pl-5  md:pr-4 sm:pr-10 pr-5">
+                    <div className="w-full relative" style={{ height: "55vh" }}>
+                      <video
+                        autoPlay
+                        playsInline
+                        muted
+                        ref={videoPlayerRef}
+                        controls={false}
+                        style={{
+                          backgroundColor: "#1c1c1c",
+                        }}
+                        className={
+                          "rounded-[10px] h-full w-full object-cover flex items-center justify-center flip"
+                        }
+                      />
+                      {!isMobile ? (
+                        <>
+                          <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center">
+                            {!webcamOn ? (
+                              <p className="text-xl xl:text-lg 2xl:text-xl text-white">
+                                The camera is off
+                              </p>
+                            ) : null}
+                          </div>
+                        </>
+                      ) : null}
+
+                      <div className="absolute xl:bottom-6 bottom-4 left-0 right-0">
+                        <div className="container grid grid-flow-col space-x-4 items-center justify-center md:-m-2">
+                          {isMicrophonePermissionAllowed ? (
+                            <ButtonWithTooltip
+                              onClick={_toggleMic}
+                              onState={micOn}
+                              mic={true}
+                              OnIcon={MicOnIcon}
+                              OffIcon={MicOffIcon}
+                            />
+                          ) : (
+                            <MicPermissionDenied />
+                          )}
+
+                          {isCameraPermissionAllowed ? (
+                            <ButtonWithTooltip
+                              onClick={_toggleWebcam}
+                              onState={webcamOn}
+                              mic={false}
+                              OnIcon={WebcamOnIcon}
+                              OffIcon={WebcamOffIcon}
+                            />
+                          ) : (
+                            <CameraPermissionDenied />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {!isMobile && (
+                      <>
+                        <div className="absolute top-2 right-10">
+                          <NetworkStats />
+                        </div>
+
+                        <div className="flex mt-3">
+                          {!isFirefox && (
+                            <>
+                              <DropDown
+                                mics={mics}
+                                changeMic={changeMic}
+                                customAudioStream={customAudioStream}
+                                audioTrack={audioTrack}
+                                micOn={micOn}
+                                didDeviceChange={didDeviceChange}
+                                setDidDeviceChange={setDidDeviceChange}
+                              />
+                              <DropDownSpeaker speakers={speakers} />
+                              <DropDownCam
+                                changeWebcam={changeWebcam}
+                                webcams={webcams}
+                              />
+                            </>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
+                <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
+                  <div className="bg-gray-800 p-4 rounded-lg mb-6 text-center max-w-lg">
+                    <h2 className="text-2xl font-bold text-blue-400 mb-2">Welcome to ieVidMeet</h2>
+                    <p className="text-white mb-3">
+                      Experience seamless video conferencing with crystal-clear audio and HD video quality. 
+                      ieVidMeet connects you with colleagues, friends, and family anywhere in the world.
+                    </p>
+                    <p className="text-gray-300 text-sm">
+                      Featuring real-time screen sharing, chat functionality, and secure meetings - all in one place.
+                    </p>
+                  </div>
+                  
+                  <MeetingDetailsScreen
+                    participantName={participantName}
+                    setParticipantName={setParticipantName}
+                    videoTrack={videoTrack}
+                    setVideoTrack={setVideoTrack}
+                    onClickStartMeeting={onClickStartMeeting}
+                    onClickJoin={async (id) => {
+                      const token = await getToken();
+                      const { meetingId, err } = await validateMeeting({
+                        roomId: id,
+                        token,
+                      });
+                      if (meetingId === id) {
+                        setToken(token);
+                        setMeetingId(id);
+                        onClickStartMeeting();
+                      } else {
+                        toast(`${err}`, {
+                          position: "bottom-left",
+                          autoClose: 4000,
+                          hideProgressBar: true,
+                          closeButton: false,
+                          pauseOnHover: true,
+                          draggable: true,
+                          progress: undefined,
+                          theme: "light",
+                        });
+                      }
+                    }}
+                    _handleOnCreateMeeting={async () => {
+                      const token = await getToken();
+                      const { meetingId, err } = await createMeeting({ token });
+
+                      if (meetingId) {
+                        setToken(token);
+                        setMeetingId(meetingId);
+                      }
+                      return { meetingId: meetingId, err: err };
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-
-          <MeetingDetailsScreen
-            participantName={participantName}
-            setParticipantName={setParticipantName}
-            videoTrack={videoTrack}
-            setVideoTrack={setVideoTrack}
-            onClickStartMeeting={onClickStartMeeting}
-            onClickJoin={async (id) => {
-              const token = await getToken();
-              const { meetingId, err } = await validateMeeting({
-                roomId: id,
-                token,
-              });
-              if (meetingId === id) {
-                setToken(token);
-                setMeetingId(id);
-                onClickStartMeeting();
-              } else {
-                toast(`${err}`, {
-                  position: "bottom-left",
-                  autoClose: 4000,
-                  hideProgressBar: true,
-                  closeButton: false,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "light",
-                });
-              }
-            }}
-            setIsMicOn={setMicOn}
-            micEnabled={micOn}
-            webcamEnabled={webcamOn}
-            setIsWebcamOn={setWebcamOn}
-          />
         </div>
       </div>
+      <ConfirmBox
+        open={dlgMuted}
+        successText="OKAY"
+        onSuccess={() => {
+          setDlgMuted(false);
+        }}
+        title="System mic is muted"
+        subTitle="You're default microphone is muted, please unmute it or increase audio
+            input volume from system settings."
+      />
+      <ConfirmBox
+        open={dlgDevices}
+        successText="DISMISS"
+        onSuccess={() => {
+          setDlgDevices(false);
+        }}
+        title="Mic or webcam not available"
+        subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
+      />
     </div>
   );
 }
