@@ -21,22 +21,31 @@ import { toast } from "react-toastify";
 // Custom component to load Tawk.to chat widget
 const TawkToChat = () => {
   useEffect(() => {
+    // Create container div
+    const containerDiv = document.createElement('div');
+    containerDiv.id = 'tawk_6616a163a0c6737bd12a56c8';
+    document.body.appendChild(containerDiv);
+    
     // Create and insert Tawk.to script
     var Tawk_API = window.Tawk_API || {};
     var Tawk_LoadStart = new Date();
-
+    Tawk_API.embedded = 'tawk_6616a163a0c6737bd12a56c8';
+    
     const script = document.createElement("script");
     script.async = true;
-    script.src = 'https://embed.tawk.to/6616a163a0c6737bd12a56c8/1hr46cts6';
+    script.src = 'https://embed.tawk.to/6616a163a0c6737bd12a56c8/1ilrgsu2o';
     script.charset = 'UTF-8';
     script.setAttribute('crossorigin', '*');
-
+    
     document.body.appendChild(script);
 
-    // Clean up function to remove the script when component unmounts
+    // Clean up function to remove the script and container when component unmounts
     return () => {
       if(script && script.parentNode) {
         script.parentNode.removeChild(script);
+      }
+      if(containerDiv && containerDiv.parentNode) {
+        containerDiv.parentNode.removeChild(containerDiv);
       }
     };
   }, []);
