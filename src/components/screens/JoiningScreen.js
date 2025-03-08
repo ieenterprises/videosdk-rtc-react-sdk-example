@@ -544,32 +544,23 @@ export function JoiningScreen({
                           <NetworkStats />
                         </div>
 
-                        <div className="flex flex-col space-y-2 mt-3">
+                        <div className="flex mt-3">
                           {!isFirefox && (
                             <>
-                              <div className="flex items-center">
-                                <span className="mr-2 text-white">Microphone:</span>
-                                <DropDown
-                                  mics={mics}
-                                  changeMic={changeMic}
-                                  customAudioStream={customAudioStream}
-                                  audioTrack={audioTrack}
-                                  micOn={micOn}
-                                  didDeviceChange={didDeviceChange}
-                                  setDidDeviceChange={setDidDeviceChange}
-                                />
-                              </div>
-                              <div className="flex items-center">
-                                <span className="mr-2 text-white">Speaker:</span>
-                                <DropDownSpeaker speakers={speakers} />
-                              </div>
-                              <div className="flex items-center">
-                                <span className="mr-2 text-white">Camera:</span>
-                                <DropDownCam
-                                  changeWebcam={changeWebcam}
-                                  webcams={webcams}
-                                />
-                              </div>
+                              <DropDown
+                                mics={mics}
+                                changeMic={changeMic}
+                                customAudioStream={customAudioStream}
+                                audioTrack={audioTrack}
+                                micOn={micOn}
+                                didDeviceChange={didDeviceChange}
+                                setDidDeviceChange={setDidDeviceChange}
+                              />
+                              <DropDownSpeaker speakers={speakers} />
+                              <DropDownCam
+                                changeWebcam={changeWebcam}
+                                webcams={webcams}
+                              />
                             </>
                           )}
                         </div>
