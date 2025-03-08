@@ -399,8 +399,11 @@ export function JoiningScreen({
   };
 
   return (
-    <div className="fixed inset-0">
-      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gray-800">
+    <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 h-screen flex flex-col bg-opacity-95 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxsaW5lIHgxPSIwIiB5PSIwIiB4Mj0iMCIgeTI9IjQwIiBzdHJva2U9IiMzNjNlNTAiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIgb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-30 z-0"></div>
+      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-blue-600 opacity-20 blur-3xl"></div>
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-purple-600 opacity-20 blur-3xl"></div>
+      <div className="overflow-y-auto flex flex-col flex-1 h-screen">
         <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16">
           <div className="container grid  md:grid-flow-col grid-flow-row ">
             <div className="grid grid-cols-12">
@@ -495,17 +498,33 @@ export function JoiningScreen({
               </div>
               <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
                 <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
-                  <div className="bg-gray-800 p-4 rounded-lg mb-6 text-center max-w-lg">
-                    <h2 className="text-2xl font-bold text-blue-400 mb-2">Welcome to ieVidMeet</h2>
-                    <p className="text-white mb-3">
+                  <div className="text-center p-6 bg-gradient-to-r from-blue-900 to-indigo-900 rounded-xl shadow-2xl mb-6 backdrop-filter backdrop-blur-lg bg-opacity-70 border border-blue-700">
+                    <h1 className="text-white text-5xl font-bold mb-4 animate-pulse">
+                      Welcome to ieVidMeet
+                    </h1>
+                    <div className="flex justify-center mb-6">
+                      <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full"></div>
+                    </div>
+                    <p className="text-white text-lg mb-4">
                       Experience seamless video conferencing with crystal-clear audio and HD video quality. 
                       ieVidMeet connects you with colleagues, friends, and family anywhere in the world.
                     </p>
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-blue-300 text-md mb-2">
                       Featuring real-time screen sharing, chat functionality, and secure meetings - all in one place.
                     </p>
+                    <div className="flex justify-center mt-4 space-x-4">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-700 text-white text-xs">
+                        HD Quality
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-700 text-white text-xs">
+                        Secure
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-700 text-white text-xs">
+                        Easy to Use
+                      </span>
+                    </div>
                   </div>
-                  
+
                   <MeetingDetailsScreen
                     participantName={participantName}
                     setParticipantName={setParticipantName}
