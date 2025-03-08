@@ -399,13 +399,13 @@ export function JoiningScreen({
   };
 
   return (
-    <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 h-screen flex flex-col bg-opacity-95 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxsaW5lIHgxPSIwIiB5PSIwIiB4Mj0iMCIgeTI9IjQwIiBzdHJva2U9IiMzNjNlNTAiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIgb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-30 z-0"></div>
-      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-blue-600 opacity-20 blur-3xl"></div>
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-purple-600 opacity-20 blur-3xl"></div>
-      <div className="overflow-y-auto flex flex-col flex-1 h-screen">
-        <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16">
-          <div className="container grid  md:grid-flow-col grid-flow-row ">
+    <div className="fixed inset-0">
+      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900">
+        <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16 relative">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxsaW5lIHgxPSIwIiB5PSIwIiB4Mj0iMCIgeTI9IjQwIiBzdHJva2U9IiMzNjNlNTAiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIgb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-20 z-0 pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-blue-500 opacity-10 blur-3xl -mr-48 -mt-48 pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-indigo-600 opacity-10 blur-3xl -ml-48 -mb-48 pointer-events-none"></div>
+          <div className="container grid md:grid-flow-col grid-flow-row relative z-10">
             <div className="grid grid-cols-12">
               <div className="md:col-span-7 2xl:col-span-7 col-span-12">
                 <div className="flex items-center justify-center p-1.5 sm:p-4 lg:p-6">
@@ -498,28 +498,29 @@ export function JoiningScreen({
               </div>
               <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
                 <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
-                  <div className="text-center p-6 bg-gradient-to-r from-blue-900 to-indigo-900 rounded-xl shadow-2xl mb-6 backdrop-filter backdrop-blur-lg bg-opacity-70 border border-blue-700">
-                    <h1 className="text-white text-5xl font-bold mb-4 animate-pulse">
-                      Welcome to ieVidMeet
-                    </h1>
-                    <div className="flex justify-center mb-6">
-                      <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full"></div>
+                  <div className="bg-gray-900 bg-opacity-60 backdrop-filter backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-gray-700 border-opacity-50 mb-6 text-center max-w-lg transform transition-all duration-500 hover:scale-105">
+                    <div className="inline-block p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 mb-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
                     </div>
-                    <p className="text-white text-lg mb-4">
+                    <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Welcome to <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">ieVidMeet</span></h2>
+                    <div className="w-16 h-1 bg-gradient-to-r from-blue-400 to-indigo-500 mx-auto mb-4 rounded-full"></div>
+                    <p className="text-gray-200 mb-4 leading-relaxed">
                       Experience seamless video conferencing with crystal-clear audio and HD video quality. 
                       ieVidMeet connects you with colleagues, friends, and family anywhere in the world.
                     </p>
-                    <p className="text-blue-300 text-md mb-2">
+                    <p className="text-blue-300 text-sm mb-2">
                       Featuring real-time screen sharing, chat functionality, and secure meetings - all in one place.
                     </p>
-                    <div className="flex justify-center mt-4 space-x-4">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-700 text-white text-xs">
+                    <div className="flex justify-center mt-4 space-x-3">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-900 bg-opacity-50 text-blue-300 text-xs font-medium">
                         HD Quality
                       </span>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-700 text-white text-xs">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-900 bg-opacity-50 text-indigo-300 text-xs font-medium">
                         Secure
                       </span>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-700 text-white text-xs">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-900 bg-opacity-50 text-purple-300 text-xs font-medium">
                         Easy to Use
                       </span>
                     </div>
