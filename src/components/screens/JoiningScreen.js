@@ -450,7 +450,7 @@ export function JoiningScreen({
     );
   };
 
-  // Add the Tawk.to chat widget
+  // Add custom styling for the Tawk.to chat widget
   useEffect(() => {
     // Add custom styling for positioning the chat widget at bottom left
     const style = document.createElement('style');
@@ -465,7 +465,9 @@ export function JoiningScreen({
     document.head.appendChild(style);
 
     return () => {
-      document.head.removeChild(style);
+      if (style.parentNode) {
+        document.head.removeChild(style);
+      }
     };
   }, []);
 
