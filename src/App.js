@@ -73,6 +73,13 @@ function App() {
                 // Remove any Tawk.to scripts
                 const tawkScripts = document.querySelectorAll('script[src*="tawk.to"]');
                 tawkScripts.forEach(script => script.remove());
+                
+                // Remove Tawk iframe and widget elements
+                const tawkIframes = document.querySelectorAll('iframe[src*="tawk.to"]');
+                tawkIframes.forEach(iframe => iframe.remove());
+                
+                const tawkWidgets = document.querySelectorAll('.tawk-min-container, .tawk-card, .tawk-chat-panel');
+                tawkWidgets.forEach(widget => widget.remove());
               }}
               setIsMeetingLeft={setIsMeetingLeft}
             />

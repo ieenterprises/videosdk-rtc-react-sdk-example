@@ -32,6 +32,7 @@ const TawkToChat = () => {
     Tawk_API.embedded = 'tawk_6616a163a0c6737bd12a56c8';
     
     const script = document.createElement("script");
+    script.id = 'tawk-to-script';
     script.async = true;
     script.src = 'https://embed.tawk.to/6616a163a0c6737bd12a56c8/1ilrgsu2o';
     script.charset = 'UTF-8';
@@ -41,12 +42,28 @@ const TawkToChat = () => {
 
     // Clean up function to remove the script and container when component unmounts
     return () => {
+      // Remove the script
       if(script && script.parentNode) {
         script.parentNode.removeChild(script);
       }
+      
+      // Remove the container
       if(containerDiv && containerDiv.parentNode) {
         containerDiv.parentNode.removeChild(containerDiv);
       }
+      
+      // Remove any other Tawk elements that might be present
+      const tawkContainer = document.getElementById('tawk_6616a163a0c6737bd12a56c8');
+      if (tawkContainer) {
+        tawkContainer.remove();
+      }
+      
+      // Remove Tawk iframe and widget elements
+      const tawkIframes = document.querySelectorAll('iframe[src*="tawk.to"]');
+      tawkIframes.forEach(iframe => iframe.remove());
+      
+      const tawkWidgets = document.querySelectorAll('.tawk-min-container, .tawk-card');
+      tawkWidgets.forEach(widget => widget.remove());
     };
   }, []);
 
