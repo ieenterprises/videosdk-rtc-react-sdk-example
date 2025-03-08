@@ -174,6 +174,7 @@ const ChatInput = ({ inputHeight }) => {
         <button
           className="p-2 text-white bg-gray-750 rounded-md"
           onClick={handleSendMessage}
+          title="Send message"
         >
           <span className="material-icons">send</span>
         </button>
