@@ -47,16 +47,14 @@ const WaitingToJoinScreen = () => {
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
-        background: "linear-gradient(135deg, #1a1c22 0%, #26282c 100%)",
+        // backgroundColor: theme.palette.darkTheme.main,
       }}
     >
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col">
         <div
           style={{
             height: isTab ? 200 : isMobile ? 200 : 250,
             width: isTab ? 200 : isMobile ? 200 : 250,
-            filter: "drop-shadow(0 0 12px rgba(85, 104, 254, 0.3))",
-            margin: "0 auto",
           }}
         >
           <Lottie
@@ -70,24 +68,9 @@ const WaitingToJoinScreen = () => {
             style={{ height: "100%", width: "100%" }}
           />
         </div>
-        <h1 
-          className="text-center font-bold mt-6 text-2xl"
-          style={{ 
-            backgroundImage: "linear-gradient(90deg, #5568FE, #76d9e6)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            textShadow: "0 2px 10px rgba(85, 104, 254, 0.2)"
-          }}
-        >
+        <h1 className="text-white text-center font-bold mt-1 text-xl">
           {message.text}
         </h1>
-        <div className="mt-4 bg-black bg-opacity-20 px-5 py-3 rounded-full">
-          <div className="flex items-center space-x-2">
-            <div className="h-2 w-2 rounded-full bg-green-150 animate-pulse"></div>
-            <p className="text-gray-400 text-sm">Preparing secure connection</p>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -57,7 +57,7 @@ input:focus-visible{
 .video-cover video {
   position: absolute;
   object-fit: cover;
-
+  
 }
 
 input[type="radio"]:checked + label span {

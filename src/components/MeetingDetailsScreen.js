@@ -16,14 +16,16 @@ export function MeetingDetailsScreen({
   const [isJoinMeetingClicked, setIsJoinMeetingClicked] = useState(false);
 
   return (
-    <div className="flex flex-1 flex-col justify-center w-full p-6 bg-gray-100 rounded-xl shadow-lg"> {/* Added background, padding, and shadow */}
+    <div
+      className={`flex flex-1 flex-col justify-center w-full md:p-[6px] sm:p-1 p-1.5`}
+    >
       {iscreateMeetingClicked ? (
-        <div className="border border-solid border-gray-400 rounded-xl px-4 py-3  flex items-center justify-center mb-4"> {/* Added margin bottom */}
-          <p className="text-gray-800 text-base font-medium"> {/* Improved text styling */}
+        <div className="border border-solid border-gray-400 rounded-xl px-4 py-3  flex items-center justify-center">
+          <p className="text-white text-base">
             {`Meeting code : ${meetingId}`}
           </p>
           <button
-            className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" {/* Improved button styling */}
+            className="ml-2"
             onClick={() => {
               navigator.clipboard.writeText(meetingId);
               setIsCopied(true);
@@ -47,12 +49,10 @@ export function MeetingDetailsScreen({
               setMeetingId(e.target.value);
             }}
             placeholder={"Enter meeting Id"}
-            className="px-4 py-3 bg-gray-200 rounded-xl text-gray-800 w-full text-center mb-2" {/* Improved input styling */}
+            className="px-4 py-3 bg-gray-650 rounded-xl text-white w-full text-center"
           />
           {meetingIdError && (
-            <p className="text-xs text-red-600 text-center"> {/* Centered error message */}
-              {`Please enter a valid meetingId`}
-            </p>
+            <p className="text-xs text-red-600">{`Please enter valid meetingId`}</p>
           )}
         </>
       ) : null}
@@ -63,11 +63,16 @@ export function MeetingDetailsScreen({
             value={participantName}
             onChange={(e) => setParticipantName(e.target.value)}
             placeholder="Enter your name"
-            className="px-4 py-3 mt-5 bg-gray-200 rounded-xl text-gray-800 w-full text-center mb-2" {/* Improved input styling */}
+            className="px-4 py-3 mt-5 bg-gray-650 rounded-xl text-white w-full text-center"
           />
+
+          {/* <p className="text-xs text-white mt-1 text-center">
+            Your name will help everyone identify you in the meeting.
+          </p> */}
           <button
             disabled={participantName.length < 3}
-            className={`w-full ${participantName.length < 3 ? "bg-gray-400" : "bg-purple-500 hover:bg-purple-700"} text-white font-bold py-2 px-4 rounded-xl mt-5`} {/* Improved button styling */}
+            className={`w-full ${participantName.length < 3 ? "bg-gray-650" : "bg-purple-350"
+              }  text-white px-2 py-3 rounded-xl mt-5`}
             onClick={(e) => {
               if (iscreateMeetingClicked) {
                 onClickStartMeeting();
@@ -84,42 +89,44 @@ export function MeetingDetailsScreen({
       )}
 
       {!iscreateMeetingClicked && !isJoinMeetingClicked && (
-        <div className="w-full md:mt-0 mt-4 flex flex-col space-y-4"> {/* Added spacing */}
-          <button
-            className="w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-xl" {/* Improved button styling */}
-            onClick={async (e) => {
-              const { meetingId, err } = await _handleOnCreateMeeting();
-
-              if (meetingId) {
-                setMeetingId(meetingId);
-                setIscreateMeetingClicked(true);
-              } else {
-                toast(
-                  `${err}`,
-                  {
-                    position: "bottom-left",
-                    autoClose: 4000,
-                    hideProgressBar: true,
-                    closeButton: false,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                  }
-                );
-              }
-            }}
-          >
-            Create a meeting
-          </button>
-          <button
-            className="w-full bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-xl" {/* Improved button styling */}
-            onClick={(e) => {
-              setIsJoinMeetingClicked(true);
-            }}
-          >
-            Join a meeting
-          </button>
+        <div className="w-full md:mt-0 mt-4 flex flex-col">
+          <div className="flex items-center justify-center flex-col w-full ">
+            <button
+              className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
+              onClick={async (e) => {
+                const { meetingId, err } = await _handleOnCreateMeeting();
+              
+                if (meetingId) {
+                  setMeetingId(meetingId);
+                  setIscreateMeetingClicked(true);
+                } else {
+                  toast(
+                    `${err}`,
+                    {
+                      position: "bottom-left",
+                      autoClose: 4000,
+                      hideProgressBar: true,
+                      closeButton: false,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "light",
+                    }
+                  );
+                }
+              }}
+            >
+              Create a meeting
+            </button>
+            <button
+              className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-5"
+              onClick={(e) => {
+                setIsJoinMeetingClicked(true);
+              }}
+            >
+              Join a meeting
+            </button>
+          </div>
         </div>
       )}
     </div>
