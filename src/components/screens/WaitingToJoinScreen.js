@@ -71,6 +71,11 @@ const WaitingToJoinScreen = () => {
         <h1 className="text-white text-center font-bold mt-1 text-xl">
           {message.text}
         </h1>
+        {localStorage.getItem("current_meeting_title") && (
+          <h2 className="text-white text-center mt-3">
+            Meeting: {localStorage.getItem("current_meeting_title")}
+          </h2>
+        )}
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ export function MeetingDetailsScreen({
   const [isCopied, setIsCopied] = useState(false);
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);
   const [isJoinMeetingClicked, setIsJoinMeetingClicked] = useState(false);
+  const [meetingTitle, setMeetingTitle] = useState("");
 
   return (
     <div
@@ -105,6 +106,14 @@ export function MeetingDetailsScreen({
 
       {(iscreateMeetingClicked || isJoinMeetingClicked) && (
         <>
+          {iscreateMeetingClicked && (
+            <input
+              value={meetingTitle || ""}
+              onChange={(e) => setMeetingTitle(e.target.value)}
+              placeholder="Title of the Meeting"
+              className="px-4 py-3 mt-5 bg-gray-650 rounded-xl text-white w-full text-center"
+            />
+          )}
           <input
             value={participantName}
             onChange={(e) => setParticipantName(e.target.value)}
@@ -121,7 +130,7 @@ export function MeetingDetailsScreen({
               }  text-white px-2 py-3 rounded-xl mt-5`}
             onClick={(e) => {
               if (iscreateMeetingClicked) {
-                onClickStartMeeting();
+                onClickStartMeeting(meetingTitle);
               } else {
                 if (meetingId.match("\\w{4}\\-\\w{4}\\-\\w{4}")) {
                   onClickJoin(meetingId);

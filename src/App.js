@@ -107,8 +107,9 @@ function App() {
             setCustomAudioStream={setCustomAudioStream}
             customVideoStream={customVideoStream}
             setCustomVideoStream={setCustomVideoStream}
-            onClickStartMeeting={() => {
+            onClickStartMeeting={(title) => {
               setMeetingStarted(true);
+              localStorage.setItem("current_meeting_title", title || "Untitled Meeting");
             }}
             startMeeting={isMeetingStarted}
             setIsMeetingLeft={setIsMeetingLeft}
