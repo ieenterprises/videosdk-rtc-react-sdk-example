@@ -1,3 +1,4 @@
+
 import { useContext, createContext, useState, useEffect, useRef } from "react";
 
 export const MeetingAppContext = createContext();
@@ -13,6 +14,7 @@ export const MeetingAppProvider = ({ children }) => {
   const [raisedHandsParticipants, setRaisedHandsParticipants] = useState([]);
   const [sideBarMode, setSideBarMode] = useState(null);
   const [pipMode, setPipMode] = useState(false);
+  const [creatorId, setCreatorId] = useState(null); // Store the meeting creator's ID
 
   const useRaisedHandParticipants = () => {
     const raisedHandsParticipantsRef = useRef();
@@ -68,7 +70,6 @@ export const MeetingAppProvider = ({ children }) => {
     <MeetingAppContext.Provider
       value={{
         // states
-
         raisedHandsParticipants,
         selectedMic,
         selectedWebcam,
@@ -77,9 +78,9 @@ export const MeetingAppProvider = ({ children }) => {
         pipMode,
         isCameraPermissionAllowed,
         isMicrophonePermissionAllowed,
+        creatorId,
 
         // setters
-
         setRaisedHandsParticipants,
         setSelectedMic,
         setSelectedWebcam,
@@ -89,6 +90,7 @@ export const MeetingAppProvider = ({ children }) => {
         useRaisedHandParticipants,
         setIsCameraPermissionAllowed,
         setIsMicrophonePermissionAllowed,
+        setCreatorId,
       }}
     >
       {children}
