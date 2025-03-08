@@ -1,11 +1,10 @@
 import { MeetingProvider } from "@videosdk.live/react-sdk";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
+import { useState } from "react";
 import { MeetingAppProvider } from "./MeetingAppContextDef";
 import { MeetingContainer } from "./meeting/MeetingContainer";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { JoiningScreen } from "./components/screens/JoiningScreen"
-import { ILSContainer } from "./components/ILSContainer";
-import { createMeeting, validateMeeting } from "./api";
 
 function App() {
   const [token, setToken] = useState("");
