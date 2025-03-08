@@ -18,6 +18,32 @@ import NetworkStats from "../NetworkStats";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { toast } from "react-toastify";
 
+// Custom component to load Tawk.to chat widget
+const TawkToChat = () => {
+  useEffect(() => {
+    // Create and insert Tawk.to script
+    var Tawk_API = window.Tawk_API || {};
+    var Tawk_LoadStart = new Date();
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = 'https://embed.tawk.to/6616a163a0c6737bd12a56c8/1hr46cts6';
+    script.charset = 'UTF-8';
+    script.setAttribute('crossorigin', '*');
+
+    document.body.appendChild(script);
+
+    // Clean up function to remove the script when component unmounts
+    return () => {
+      if(script && script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, []);
+
+  return null;
+};
+
 export function JoiningScreen({
   participantName,
   setParticipantName,
@@ -398,8 +424,29 @@ export function JoiningScreen({
     );
   };
 
+  // Add the Tawk.to chat widget
+  useEffect(() => {
+    // Add custom styling for positioning the chat widget at bottom left
+    const style = document.createElement('style');
+    style.textContent = `
+      .tawk-min-container {
+        margin: 0 !important;
+        left: 20px !important;
+        right: auto !important;
+        bottom: 20px !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0">
+      {/* Render the Tawk.to chat component */}
+      <TawkToChat />
       <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-white">
         <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16 relative">
           <div className="absolute inset-0 bg-indigo-800 opacity-5 z-0 pointer-events-none"></div>
@@ -501,14 +548,14 @@ export function JoiningScreen({
                     <p className="text-white text-sm mb-6">
                       Seamless HD video calls, crystal-clear audio, secure meetings, and real-time collaboration.
                     </p>
-                    
+
                     <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-md mb-3 flex justify-center items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
                       </svg>
                       Create a Meeting
                     </button>
-                    
+
                     <button className="w-full border border-gray-300 hover:bg-indigo-700 text-white py-3 rounded-md mb-6">
                       <div className="flex justify-center items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -518,7 +565,7 @@ export function JoiningScreen({
                         Join a Meeting
                       </div>
                     </button>
-                    
+
                     <div className="bg-indigo-700 bg-opacity-50 rounded-md p-4 text-left">
                       <h3 className="text-white text-sm font-medium mb-2">Quick Start Guide</h3>
                       <div className="flex items-center text-white text-xs mb-2">
