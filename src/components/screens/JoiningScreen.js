@@ -1,28 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Constants,
-  useMeeting,
-  useMediaDevice,
-  useMediaStream,
-} from "@videosdk.live/react-sdk";
-import useIsMobile from "../../hooks/useIsMobile";
-import useIsTab from "../../hooks/useIsTab";
 import { MeetingDetailsScreen } from "../MeetingDetailsScreen";
-import { useMeetingAppContext } from "../../MeetingAppContextDef";
-import { useSnackbar } from "notistack";
-import { VideocamOff, MicOff } from "@material-ui/icons";
-import MicIcon from "@material-ui/icons/Mic";
-import VideocamIcon from "@material-ui/icons/Videocam";
-import { Tooltip } from "@material-ui/core";
-import { ReactComponent as CopyIcon } from "../../icons/copy-icon.svg";
-import { toast } from "react-toastify";
-import { getToken } from "../../api";
-import { createMeeting, validateMeeting } from "../../api";
-import SettingDialogueBox from "../SettingDialogueBox";
+import { createMeeting, getToken, validateMeeting } from "../../api";
+import ConfirmBox from "../ConfirmBox";
+import { Constants, useMediaDevice } from "@videosdk.live/react-sdk";
+import useMediaStream from "../../hooks/useMediaStream";
+import useIsMobile from "../../hooks/useIsMobile";
 import WebcamOffIcon from "../../icons/WebcamOffIcon";
-import WebcamOnIcon from "../../icons/WebcamOnIcon";
+import WebcamOnIcon from "../../icons/Bottombar/WebcamOnIcon";
 import MicOffIcon from "../../icons/MicOffIcon";
-import MicOnIcon from "../../icons/MicOnIcon";
+import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
+import MicPermissionDenied from "../../icons/MicPermissionDenied";
+import CameraPermissionDenied from "../../icons/CameraPermissionDenied";
+import DropDown from "../DropDown";
+import DropDownCam from "../DropDownCam";
+import DropDownSpeaker from "../DropDownSpeaker";
+import NetworkStats from "../NetworkStats";
+import { useMeetingAppContext } from "../../MeetingAppContextDef";
+import { toast } from "react-toastify";
 
 export function JoiningScreen({
   participantName,
@@ -87,325 +81,495 @@ export function JoiningScreen({
   }, [micOn]);
 
   useEffect(() => {
-    checkPermissions().then((permission) => {
-      permissonAvaialble.current = permission;
-
-      if (permission.video) {
-        setIsCameraPermissionAllowed(true);
-        getCameras()
-          .then((cameras) => {
-            setDevices((s) => ({ ...s, webcams: cameras }));
-          })
-          .catch(() => {
-            setIsCameraPermissionAllowed(false);
-          });
-      } else {
-        setIsCameraPermissionAllowed(false);
-      }
-
-      if (permission.audio) {
-        setIsMicrophonePermissionAllowed(true);
-        getMicrophones()
-          .then((micros) => {
-            setDevices((s) => ({ ...s, mics: micros }));
-          })
-          .catch(() => {
-            setIsMicrophonePermissionAllowed(false);
-          });
-        getPlaybackDevices()
-          .then((speakerDevices) => {
-            setDevices((s) => ({ ...s, speakers: speakerDevices }));
-          })
-          .catch(() => {});
-      } else {
-        setIsMicrophonePermissionAllowed(false);
-      }
-    });
-  }, []);
+    permissonAvaialble.current = {
+      isCameraPermissionAllowed,
+      isMicrophonePermissionAllowed,
+    };
+  }, [isCameraPermissionAllowed, isMicrophonePermissionAllowed]);
 
   useEffect(() => {
-    if (!webcamOn) {
+    if (micOn) {
+      audioTrackRef.current = audioTrack;
+      startMuteListener();
+    }
+  }, [micOn, audioTrack]);
+
+  useEffect(() => {
+    if (webcamOn) {
+
+      // Close the existing video track if there's a new one
+      if (videoTrackRef.current && videoTrackRef.current !== videoTrack) {
+        videoTrackRef.current.stop(); // Stop the existing video track
+      }
+
+      videoTrackRef.current = videoTrack;
+
+      var isPlaying =
+        videoPlayerRef.current.currentTime > 0 &&
+        !videoPlayerRef.current.paused &&
+        !videoPlayerRef.current.ended &&
+        videoPlayerRef.current.readyState >
+        videoPlayerRef.current.HAVE_CURRENT_DATA;
+
+      if (videoTrack) {
+        const videoSrcObject = new MediaStream([videoTrack]);
+
+        if (videoPlayerRef.current) {
+          videoPlayerRef.current.srcObject = videoSrcObject;
+          if (videoPlayerRef.current.pause && !isPlaying) {
+            videoPlayerRef.current
+              .play()
+              .catch((error) => console.log("error", error));
+          }
+        }
+      } else {
+        if (videoPlayerRef.current) {
+          videoPlayerRef.current.srcObject = null;
+        }
+      }
+    }
+  }, [webcamOn, videoTrack]);
+
+  useEffect(() => {
+    getCameraDevices();
+  }, [isCameraPermissionAllowed]);
+
+  useEffect(() => {
+    getAudioDevices();
+  }, [isMicrophonePermissionAllowed]);
+
+  useEffect(() => {
+    checkMediaPermission();
+    return () => { };
+  }, []);
+
+  const _toggleWebcam = () => {
+    const videoTrack = videoTrackRef.current;
+
+    if (webcamOn) {
       if (videoTrack) {
         videoTrack.stop();
         setVideoTrack(null);
-      }
-      setCustomVideoStream(null);
-      return;
-    }
-    if (!isCameraPermissionAllowed) {
-      return;
-    }
-    if (!selectedWebcam?.id) {
-      if (webcams.length) {
-        setSelectedWebcam(webcams[0]);
-      }
-      return;
-    }
-
-    getVideoTrack(selectedWebcam.id)
-      .then(async (stream) => {
-        videoTrackRef.current = stream;
-        setCustomVideoStream(stream);
-        if (videoPlayerRef.current) {
-          videoPlayerRef.current.srcObject = new MediaStream([stream]);
-          videoPlayerRef.current.play();
-        }
-        setVideoTrack(stream);
-      })
-      .catch((err) => {
+        setCustomVideoStream(null);
         setWebcamOn(false);
-        console.log("Error getting stream ", err);
-      });
-  }, [webcamOn, selectedWebcam, didDeviceChange, isCameraPermissionAllowed]);
+      }
+    } else {
+      getDefaultMediaTracks({ mic: false, webcam: true });
+      setWebcamOn(true);
+    }
+  };
 
-  useEffect(() => {
-    if (!micOn) {
+  const _toggleMic = () => {
+    const audioTrack = audioTrackRef.current;
+
+    if (micOn) {
       if (audioTrack) {
         audioTrack.stop();
         setAudioTrack(null);
-      }
-      setCustomAudioStream(null);
-      return;
-    }
-    if (!isMicrophonePermissionAllowed) {
-      return;
-    }
-    if (!selectedMic?.id) {
-      if (mics.length) {
-        setSelectedMic(mics[0]);
-      }
-      return;
-    }
-
-    getAudioTrack(selectedMic.id)
-      .then(async (stream) => {
-        audioTrackRef.current = stream;
-        setCustomAudioStream(stream);
-        setAudioTrack(stream);
-      })
-      .catch((err) => {
+        setCustomAudioStream(null);
         setMicOn(false);
-        console.log("Error getting stream ", err);
+      }
+    } else {
+      getDefaultMediaTracks({ mic: true, webcam: false });
+      setMicOn(true);
+    }
+  };
+
+  const changeWebcam = async (deviceId) => {
+    if (webcamOn) {
+      const currentvideoTrack = videoTrackRef.current;
+      if (currentvideoTrack) {
+        currentvideoTrack.stop();
+      }
+
+      const stream = await getVideoTrack({
+        webcamId: deviceId,
       });
-  }, [micOn, selectedMic, didDeviceChange, isMicrophonePermissionAllowed]);
+      setCustomVideoStream(stream);
+      const videoTracks = stream?.getVideoTracks();
+      const videoTrack = videoTracks?.length ? videoTracks[0] : null;
+      setVideoTrack(videoTrack);
+    }
+  };
+  const changeMic = async (deviceId) => {
 
-  const changeWebcam = (deviceId) => {
-    webcams.forEach((webcam) => {
-      if (webcam.id === deviceId) {
-        setSelectedWebcam(webcam);
-      }
-    });
+
+    if (micOn) {
+      const currentAudioTrack = audioTrackRef.current;
+      currentAudioTrack && currentAudioTrack.stop();
+      const stream = await getAudioTrack({
+        micId: deviceId,
+      });
+      setCustomAudioStream(stream);
+      const audioTracks = stream?.getAudioTracks();
+      const audioTrack = audioTracks.length ? audioTracks[0] : null;
+      clearInterval(audioAnalyserIntervalRef.current);
+      setAudioTrack(audioTrack);
+    }
   };
 
-  const changeMic = (deviceId) => {
-    mics.forEach((mic) => {
-      if (mic.id === deviceId) {
-        setSelectedMic(mic);
-      }
-    });
+  const getDefaultMediaTracks = async ({ mic, webcam }) => {
+
+    if (mic) {
+      const stream = await getAudioTrack({
+        micId: selectedMic.id,
+      });
+      setCustomAudioStream(stream);
+      const audioTracks = stream?.getAudioTracks();
+      const audioTrack = audioTracks.length ? audioTracks[0] : null;
+      setAudioTrack(audioTrack);
+    }
+
+    if (webcam) {
+      const stream = await getVideoTrack({
+        webcamId: selectedWebcam.id,
+      });
+      setCustomVideoStream(stream);
+      const videoTracks = stream?.getVideoTracks();
+      const videoTrack = videoTracks?.length ? videoTracks[0] : null;
+      setVideoTrack(videoTrack);
+    }
   };
 
-  const changeSpeaker = (deviceId) => {
-    speakers.forEach((speaker) => {
-      if (speaker.id === deviceId) {
-        setSelectedSpeaker(speaker);
+  async function startMuteListener() {
+    const currentAudioTrack = audioTrackRef.current;
+    if (currentAudioTrack) {
+      if (currentAudioTrack.muted) {
+        setDlgMuted(true);
       }
-    });
-  };
-
-  function onDeviceChanged(deviceId, deviceType) {
-    console.log(deviceId, deviceType);
-    if (deviceType === "videoinput") {
-      const webcam = { id: deviceId };
-      console.log(webcam);
-      setSelectedWebcam(webcam);
-    } else if (deviceType === "audioinput") {
-      const mic = { id: deviceId };
-      setSelectedMic(mic);
+      currentAudioTrack.addEventListener("mute", (ev) => {
+        setDlgMuted(true);
+      });
     }
   }
 
-  function handleClickOpen() {
-    setDlgMuted(true);
+  const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+  async function requestAudioVideoPermission(mediaType) {
+    try {
+      const permission = await requestPermission(mediaType);
+
+      // For Video
+      if (isFirefox) {
+        const isVideoAllowed = permission.get("video");
+        setIsCameraPermissionAllowed(isVideoAllowed);
+        if (isVideoAllowed) {
+          setWebcamOn(true);
+          await getDefaultMediaTracks({ mic: false, webcam: true });
+        }
+      }
+
+      // For Audio
+      if (isFirefox) {
+        const isAudioAllowed = permission.get("audio");
+        setIsMicrophonePermissionAllowed(isAudioAllowed);
+        if (isAudioAllowed) {
+          setMicOn(true);
+          await getDefaultMediaTracks({ mic: true, webcam: false });
+        }
+      }
+
+      if (mediaType === Constants.permission.AUDIO) {
+        const isAudioAllowed = permission.get(Constants.permission.AUDIO);
+        setIsMicrophonePermissionAllowed(isAudioAllowed);
+        if (isAudioAllowed) {
+          setMicOn(true);
+          await getDefaultMediaTracks({ mic: true, webcam: false });
+        }
+      }
+
+      if (mediaType === Constants.permission.VIDEO) {
+        const isVideoAllowed = permission.get(Constants.permission.VIDEO);
+        setIsCameraPermissionAllowed(isVideoAllowed);
+        if (isVideoAllowed) {
+          setWebcamOn(true);
+          await getDefaultMediaTracks({ mic: false, webcam: true });
+        }
+      }
+    } catch (ex) {
+      console.log("Error in requestPermission", ex);
+    }
+  }
+  function onDeviceChanged() {
+    setDidDeviceChange(true);
+    getCameraDevices();
+    getAudioDevices();
+    getDefaultMediaTracks({ mic: micRef.current, webcam: webcamRef.current });
   }
 
-  function handleClose() {
-    setDlgMuted(false);
-  }
+  const checkMediaPermission = async () => {
+    try {
+      const checkAudioVideoPermission = await checkPermissions();
+      const cameraPermissionAllowed = checkAudioVideoPermission.get(
+        Constants.permission.VIDEO
+      );
+      const microphonePermissionAllowed = checkAudioVideoPermission.get(
+        Constants.permission.AUDIO
+      );
 
-  function openDeviceSelectionDlg() {
-    setDlgDevices(true);
-  }
+      setIsCameraPermissionAllowed(cameraPermissionAllowed);
+      setIsMicrophonePermissionAllowed(microphonePermissionAllowed);
 
-  function closeDeviceSelectionDlg() {
-    setDlgDevices(false);
-  }
+      if (microphonePermissionAllowed) {
+        setMicOn(true);
+        getDefaultMediaTracks({ mic: true, webcam: false });
+      } else {
+        await requestAudioVideoPermission(Constants.permission.AUDIO);
+      }
+      if (cameraPermissionAllowed) {
+        setWebcamOn(true);
+        getDefaultMediaTracks({ mic: false, webcam: true });
+      } else {
+        await requestAudioVideoPermission(Constants.permission.VIDEO);
+      }
+    } catch (error) {
+      // For firefox, it will request audio and video simultaneously.
+      await requestAudioVideoPermission();
+      console.log(error);
+    }
+  };
 
-  // Load Tawk.to script
+  const getCameraDevices = async () => {
+    try {
+      if (permissonAvaialble.current?.isCameraPermissionAllowed) {
+        let webcams = await getCameras();
+        setSelectedWebcam({
+          id: webcams[0]?.deviceId,
+          label: webcams[0]?.label,
+        });
+        setDevices((devices) => {
+          return { ...devices, webcams };
+        });
+      }
+    } catch (err) {
+      console.log("Error in getting camera devices", err);
+    }
+  };
+
+
+
+  const getAudioDevices = async () => {
+    try {
+      if (permissonAvaialble.current?.isMicrophonePermissionAllowed) {
+        let mics = await getMicrophones();
+        console.log(mics)
+        let speakers = await getPlaybackDevices();
+        const hasMic = mics.length > 0;
+        if (hasMic) {
+          startMuteListener();
+        }
+        await setSelectedSpeaker({
+          id: speakers[0]?.deviceId,
+          label: speakers[0]?.label,
+        });
+        await setSelectedMic({ id: mics[0]?.deviceId, label: mics[0]?.label });
+        setDevices((devices) => {
+          return { ...devices, mics, speakers };
+        });
+      }
+    } catch (err) {
+      console.log("Error in getting audio devices", err);
+    }
+  };
+
+
   useEffect(() => {
-    const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.async = true;
-    script.innerHTML = `
-      var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-      (function(){
-        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-        s1.async=true;
-        s1.src='https://embed.tawk.to/6616a163a0c6737bd12a56c8/1hr46cts6';
-        s1.charset='UTF-8';
-        s1.setAttribute('crossorigin','*');
-        s0.parentNode.insertBefore(s1,s0);
-      })();
-    `;
-    document.body.appendChild(script);
+    getAudioDevices()
+  }, [])
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  const ButtonWithTooltip = ({ onClick, onState, OnIcon, OffIcon }) => {
+    const btnRef = useRef();
+    return (
+      <>
+        <div>
+          <button
+            ref={btnRef}
+            onClick={onClick}
+            className={`rounded-full min-w-auto w-12 h-12 flex items-center justify-center 
+            ${onState ? "bg-white" : "bg-red-650 text-white"}`}
+          >
+            {onState ? (
+              <OnIcon fillcolor={onState ? "#050A0E" : "#fff"} />
+            ) : (
+              <OffIcon fillcolor={onState ? "#050A0E" : "#fff"} />
+            )}
+          </button>
+        </div>
+      </>
+    );
+  };
 
   return (
-    <div className="bg-white min-h-screen flex flex-col">
-      {/* Transparent Header with Logo */}
-      <header className="bg-transparent flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <div className="flex items-center">
-          <h1 className="text-3xl font-bold text-blue-600">ieVidMeet</h1>
-        </div>
-        <div className="text-gray-600 text-sm">
-          <a href="#" className="mr-4 hover:text-blue-600">About</a>
-          <a href="#" className="mr-4 hover:text-blue-600">Features</a>
-          <a href="#" className="hover:text-blue-600">Help</a>
-        </div>
-      </header>
+    <div className="fixed inset-0">
+      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gray-800">
+        <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16">
+          <div className="container grid  md:grid-flow-col grid-flow-row ">
+            <div className="grid grid-cols-12">
+              <div className="md:col-span-7 2xl:col-span-7 col-span-12">
+                <div className="flex items-center justify-center p-1.5 sm:p-4 lg:p-6">
+                  <div className="relative w-full md:pl-4 sm:pl-10 pl-5  md:pr-4 sm:pr-10 pr-5">
+                    <div className="w-full relative" style={{ height: "55vh" }}>
+                      <video
+                        autoPlay
+                        playsInline
+                        muted
+                        ref={videoPlayerRef}
+                        controls={false}
+                        style={{
+                          backgroundColor: "#1c1c1c",
+                        }}
+                        className={
+                          "rounded-[10px] h-full w-full object-cover flex items-center justify-center flip"
+                        }
+                      />
+                      {!isMobile ? (
+                        <>
+                          <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center">
+                            {!webcamOn ? (
+                              <p className="text-xl xl:text-lg 2xl:text-xl text-white">
+                                The camera is off
+                              </p>
+                            ) : null}
+                          </div>
+                        </>
+                      ) : null}
 
-      <div className="flex-1 grid md:grid-cols-12 grid-cols-1">
-        {/* Left side - Video Preview */}
-        <div className="md:col-span-7 bg-gray-50 p-8 flex items-center justify-center">
-          <div className="relative max-w-lg w-full rounded-xl overflow-hidden shadow-lg bg-white p-6">
-            <h2 className="text-2xl font-semibold text-center mb-6">Camera Preview</h2>
+                      <div className="absolute xl:bottom-6 bottom-4 left-0 right-0">
+                        <div className="container grid grid-flow-col space-x-4 items-center justify-center md:-m-2">
+                          {isMicrophonePermissionAllowed ? (
+                            <ButtonWithTooltip
+                              onClick={_toggleMic}
+                              onState={micOn}
+                              mic={true}
+                              OnIcon={MicOnIcon}
+                              OffIcon={MicOffIcon}
+                            />
+                          ) : (
+                            <MicPermissionDenied />
+                          )}
 
-            <div className="relative rounded-lg overflow-hidden bg-gray-800 aspect-video mb-4">
-              {webcamOn ? (
-                <video
-                  autoPlay
-                  playsInline
-                  muted
-                  ref={videoPlayerRef}
-                  controls={false}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <VideocamOff className="text-white" style={{ fontSize: 40 }} />
+                          {isCameraPermissionAllowed ? (
+                            <ButtonWithTooltip
+                              onClick={_toggleWebcam}
+                              onState={webcamOn}
+                              mic={false}
+                              OnIcon={WebcamOnIcon}
+                              OffIcon={WebcamOffIcon}
+                            />
+                          ) : (
+                            <CameraPermissionDenied />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {!isMobile && (
+                      <>
+                        <div className="absolute top-2 right-10">
+                          <NetworkStats />
+                        </div>
+
+                        <div className="flex mt-3">
+                          {!isFirefox && (
+                            <>
+                              <DropDown
+                                mics={mics}
+                                changeMic={changeMic}
+                                customAudioStream={customAudioStream}
+                                audioTrack={audioTrack}
+                                micOn={micOn}
+                                didDeviceChange={didDeviceChange}
+                                setDidDeviceChange={setDidDeviceChange}
+                              />
+                              <DropDownSpeaker speakers={speakers} />
+                              <DropDownCam
+                                changeWebcam={changeWebcam}
+                                webcams={webcams}
+                              />
+                            </>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
+              <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
+                <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
+                  <div className="bg-gray-800 p-4 rounded-lg mb-6 text-center max-w-lg">
+                    <h2 className="text-2xl font-bold text-blue-400 mb-2">Welcome to ieVidMeet</h2>
+                    <p className="text-white mb-3">
+                      Experience seamless video conferencing with crystal-clear audio and HD video quality. 
+                      ieVidMeet connects you with colleagues, friends, and family anywhere in the world.
+                    </p>
+                    <p className="text-gray-300 text-sm">
+                      Featuring real-time screen sharing, chat functionality, and secure meetings - all in one place.
+                    </p>
+                  </div>
+                  
+                  <MeetingDetailsScreen
+                    participantName={participantName}
+                    setParticipantName={setParticipantName}
+                    videoTrack={videoTrack}
+                    setVideoTrack={setVideoTrack}
+                    onClickStartMeeting={onClickStartMeeting}
+                    onClickJoin={async (id) => {
+                      const token = await getToken();
+                      const { meetingId, err } = await validateMeeting({
+                        roomId: id,
+                        token,
+                      });
+                      if (meetingId === id) {
+                        setToken(token);
+                        setMeetingId(id);
+                        onClickStartMeeting();
+                      } else {
+                        toast(`${err}`, {
+                          position: "bottom-left",
+                          autoClose: 4000,
+                          hideProgressBar: true,
+                          closeButton: false,
+                          pauseOnHover: true,
+                          draggable: true,
+                          progress: undefined,
+                          theme: "light",
+                        });
+                      }
+                    }}
+                    _handleOnCreateMeeting={async () => {
+                      const token = await getToken();
+                      const { meetingId, err } = await createMeeting({ token });
 
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
-                <button
-                  className={`p-3 rounded-full ${micOn ? "bg-blue-600" : "bg-red-600"}`}
-                  onClick={() => setMicOn(!micOn)}
-                >
-                  {micOn ? (
-                    <MicIcon className="text-white" />
-                  ) : (
-                    <MicOff className="text-white" />
-                  )}
-                </button>
-
-                <button
-                  className={`p-3 rounded-full ${webcamOn ? "bg-blue-600" : "bg-red-600"}`}
-                  onClick={() => setWebcamOn(!webcamOn)}
-                >
-                  {webcamOn ? (
-                    <VideocamIcon className="text-white" />
-                  ) : (
-                    <VideocamOff className="text-white" />
-                  )}
-                </button>
-
-                <button
-                  className="p-3 rounded-full bg-gray-700"
-                  onClick={openDeviceSelectionDlg}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </button>
+                      if (meetingId) {
+                        setToken(token);
+                        setMeetingId(meetingId);
+                      }
+                      return { meetingId: meetingId, err: err };
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Right side - Join Form */}
-        <div className="md:col-span-5 flex flex-col items-center justify-center p-8">
-          <div className="max-w-md w-full">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to ieVidMeet</h1>
-              <p className="text-gray-600 text-lg">Exclusive Private Video Chat for Code Calls</p>
-            </div>
-
-            <MeetingDetailsScreen
-              participantName={participantName}
-              setParticipantName={setParticipantName}
-              videoTrack={videoTrack}
-              setVideoTrack={setVideoTrack}
-              onClickStartMeeting={onClickStartMeeting}
-              onClickJoin={async (id) => {
-                const token = await getToken();
-                const { meetingId, err } = await validateMeeting({
-                  roomId: id,
-                  token,
-                });
-                if (meetingId === id) {
-                  setToken(token);
-                  setMeetingId(id);
-                  onClickStartMeeting();
-                } else {
-                  toast(`${err}`, {
-                    position: "bottom-left",
-                    autoClose: 4000,
-                    hideProgressBar: true,
-                    closeButton: false,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  });
-                }
-              }}
-              _handleOnCreateMeeting={async () => {
-                const token = await getToken();
-                const _meetingId = await createMeeting({ token });
-                setToken(token);
-                setMeetingId(_meetingId);
-                onClickStartMeeting();
-              }}
-            />
-          </div>
-        </div>
       </div>
-
-      {/* Footer with additional info */}
-      <footer className="bg-gray-50 py-8 text-center border-t border-gray-200">
-        <p className="text-gray-600 mb-2">Secure, HD quality video conferencing for professionals</p>
-        <p className="text-gray-500 text-sm">© 2023 ieVidMeet. All rights reserved.</p>
-      </footer>
-
-      {/* Settings Dialog */}
-      <SettingDialogueBox
+      <ConfirmBox
+        open={dlgMuted}
+        successText="OKAY"
+        onSuccess={() => {
+          setDlgMuted(false);
+        }}
+        title="System mic is muted"
+        subTitle="You're default microphone is muted, please unmute it or increase audio
+            input volume from system settings."
+      />
+      <ConfirmBox
         open={dlgDevices}
-        onClose={closeDeviceSelectionDlg}
-        popupPlacement={isMobile ? "bottom" : "right"}
-        webcams={webcams}
-        mics={mics}
-        speakers={speakers}
-        setSelectedWebcam={changeWebcam}
-        setSelectedMic={changeMic}
-        setSelectedSpeaker={changeSpeaker}
-        selectedWebcam={selectedWebcam}
-        selectedMic={selectedMic}
-        selectedSpeaker={selectedSpeaker}
-        setDidDeviceChange={setDidDeviceChange}
+        successText="DISMISS"
+        onSuccess={() => {
+          setDlgDevices(false);
+        }}
+        title="Mic or webcam not available"
+        subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
       />
     </div>
   );
