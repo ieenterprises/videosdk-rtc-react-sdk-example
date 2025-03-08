@@ -90,6 +90,32 @@ export function JoiningScreen({
     checkDeviceAvailability();
   }, [webcamOn, micOn]);
 
+  // Function to safely get media tracks with better error handling
+  const safeGetMediaTracks = async (options) => {
+    try {
+      return await getDefaultMediaTracks(options);
+    } catch (error) {
+      console.error("Media device error:", error);
+      // Handle specific cases
+      if (error.name === 'NotFoundError' || error.message.includes("Requested device not found")) {
+        toast(`Camera or microphone not found. Please check your device connections.`, {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+
+        // Automatically turn off the devices that aren't available
+        if (options.webcamOn) setWebcamOn(false);
+        if (options.micOn) setMicOn(false);
+      }
+      return null;
+    }
+  };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
