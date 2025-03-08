@@ -167,7 +167,7 @@ export default function DropDown({
                   ? "text-white ring-1 ring-gray-250 bg-black"
                   : "text-customGray-250 hover:text-white"
                 }
-              group inline-flex items-center rounded-md px-1 py-1 w-44 text-base font-normal
+              group inline-flex items-center rounded-md px-3 py-1 w-44 text-base font-normal
               ${!isMicrophonePermissionAllowed ? "opacity-50" : ""}`}
               onClick={() => {
                 if (mediaRecorder.current != null && mediaRecorder.current.state == "recording") { stopRecording() }
@@ -175,13 +175,12 @@ export default function DropDown({
                 setRecordingStatus("inactive")
               }}
             >
-              <DropMIC fillColor={isHovered || open ? "#FFF" : "#B4B4B4"} />
-              <span className="overflow-hidden whitespace-nowrap overflow-ellipsis w-28 ml-6">
+              <span className="overflow-hidden whitespace-nowrap overflow-ellipsis w-32">
                 {isMicrophonePermissionAllowed ? selectedMic?.label : "Permission Needed"}
               </span>
               <ChevronDownIcon
-                className={`${open ? 'text-white' : 'text-customGray-250 hover:text-white'}
-                ml-8 h-5 w-5 transition duration-150 ease-in-out group-hover:text-orange-300/80 mt-1`}
+                className={`${open ? 'text-orange-300' : 'text-orange-300/70'}
+                ml-auto h-5 w-5 transition duration-150 ease-in-out group-hover:text-orange-300/80 mt-1`}
                 aria-hidden="true"
               />
             </Popover.Button>
@@ -294,4 +293,3 @@ export default function DropDown({
     </>
   )
 }
-
