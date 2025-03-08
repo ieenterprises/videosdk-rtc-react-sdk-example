@@ -16,7 +16,6 @@ function App() {
   const [customVideoStream, setCustomVideoStream] = useState(null)
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
-  const [showTawkChat, setShowTawkChat] = useState(true); // State to control chat visibility
 
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
@@ -40,10 +39,8 @@ function App() {
   return (
     <>
       <MeetingAppProvider>
-        {/* Include TawkToChat with conditional visibility */}
-        <TawkToChat isVisible={!isMeetingStarted || isMeetingLeft} />
-        
         {isMeetingStarted ? (
+
           <MeetingProvider
             config={{
               meetingId,
@@ -66,7 +63,23 @@ function App() {
                 setWebcamOn(false);
                 setMicOn(false);
                 setMeetingStarted(false);
-                // TawkToChat will reappear automatically due to our isVisible prop
+                
+                // Clean up any Tawk.to elements that might be present
+                const tawkContainer = document.getElementById('tawk_6616a163a0c6737bd12a56c8');
+                if (tawkContainer) {
+                  tawkContainer.remove();
+                }
+                
+                // Remove any Tawk.to scripts
+                const tawkScripts = document.querySelectorAll('script[src*="tawk.to"]');
+                tawkScripts.forEach(script => script.remove());
+                
+                // Remove Tawk iframe and widget elements
+                const tawkIframes = document.querySelectorAll('iframe[src*="tawk.to"]');
+                tawkIframes.forEach(iframe => iframe.remove());
+                
+                const tawkWidgets = document.querySelectorAll('.tawk-min-container, .tawk-card, .tawk-chat-panel');
+                tawkWidgets.forEach(widget => widget.remove());
               }}
               setIsMeetingLeft={setIsMeetingLeft}
             />

@@ -19,7 +19,56 @@ import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { toast } from "react-toastify";
 
 // Custom component to load Tawk.to chat widget
-import TawkToChat from '../TawkToChat';
+const TawkToChat = () => {
+  useEffect(() => {
+    // Create container div
+    const containerDiv = document.createElement('div');
+    containerDiv.id = 'tawk_6616a163a0c6737bd12a56c8';
+    document.body.appendChild(containerDiv);
+    
+    // Create and insert Tawk.to script
+    var Tawk_API = window.Tawk_API || {};
+    var Tawk_LoadStart = new Date();
+    Tawk_API.embedded = 'tawk_6616a163a0c6737bd12a56c8';
+    
+    const script = document.createElement("script");
+    script.id = 'tawk-to-script';
+    script.async = true;
+    script.src = 'https://embed.tawk.to/6616a163a0c6737bd12a56c8/1ilrgsu2o';
+    script.charset = 'UTF-8';
+    script.setAttribute('crossorigin', '*');
+    
+    document.body.appendChild(script);
+
+    // Clean up function to remove the script and container when component unmounts
+    return () => {
+      // Remove the script
+      if(script && script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      
+      // Remove the container
+      if(containerDiv && containerDiv.parentNode) {
+        containerDiv.parentNode.removeChild(containerDiv);
+      }
+      
+      // Remove any other Tawk elements that might be present
+      const tawkContainer = document.getElementById('tawk_6616a163a0c6737bd12a56c8');
+      if (tawkContainer) {
+        tawkContainer.remove();
+      }
+      
+      // Remove Tawk iframe and widget elements
+      const tawkIframes = document.querySelectorAll('iframe[src*="tawk.to"]');
+      tawkIframes.forEach(iframe => iframe.remove());
+      
+      const tawkWidgets = document.querySelectorAll('.tawk-min-container, .tawk-card');
+      tawkWidgets.forEach(widget => widget.remove());
+    };
+  }, []);
+
+  return null;
+};
 
 export function JoiningScreen({
   participantName,
@@ -401,10 +450,29 @@ export function JoiningScreen({
     );
   };
 
-  // Style handling is now in the TawkToChat component
+  // Add the Tawk.to chat widget
+  useEffect(() => {
+    // Add custom styling for positioning the chat widget at bottom left
+    const style = document.createElement('style');
+    style.textContent = `
+      .tawk-min-container {
+        margin: 0 !important;
+        left: 20px !important;
+        right: auto !important;
+        bottom: 20px !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <div className="fixed inset-0">
+      {/* Render the Tawk.to chat component */}
+      <TawkToChat />
       <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-white">
         <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16 relative">
           <div className="absolute inset-0 bg-indigo-800 opacity-5 z-0 pointer-events-none"></div>
