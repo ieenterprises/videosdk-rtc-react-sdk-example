@@ -1,77 +1,97 @@
+
 import React, { useState } from "react";
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import { FiMic, FiMicOff, FiVideo, FiVideoOff, FiUserX } from "react-icons/fi";
 import RemoveParticipantConfirmation from "../RemoveParticipantConfirmation";
 
 const ParticipantListItem = ({ participantId }) => {
-  const { micOn, webcamOn, displayName, isLocal } = useParticipant(participantId);
-  const { toggleMic, toggleWebcam, remove } = useParticipant(participantId);
-  const { localParticipant } = useMeeting();
-  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
+  const { localParticipantId, removeParticipant } = useMeeting();
+  const {
+    displayName,
+    webcamOn,
+    micOn,
+    isLocal,
+  } = useParticipant(participantId);
+  
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  
+  const isHost = localParticipantId === participantId;
+  const canControl = !isLocal && localParticipantId === participantId;
 
-  const isHost = localParticipant?.id !== participantId;
+  const handleRemoveParticipant = () => {
+    setShowConfirmation(true);
+  };
+
+  const confirmRemoveParticipant = () => {
+    removeParticipant(participantId);
+    setShowConfirmation(false);
+  };
+
+  const cancelRemoveParticipant = () => {
+    setShowConfirmation(false);
+  };
 
   return (
-    <>
-      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
-        <div className="flex items-center">
-          <div className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center mr-3">
-            {displayName ? displayName.charAt(0).toUpperCase() : "U"}
-          </div>
-          <p className="text-white">{displayName || "Unnamed"} {isLocal ? "(You)" : ""}</p>
+    <div className="flex items-center justify-between w-full py-3 px-4 hover:bg-gray-750">
+      <div className="flex items-center">
+        <div className="h-10 w-10 rounded-full bg-gray-750 flex items-center justify-center mr-3 text-white">
+          {displayName?.charAt(0).toUpperCase()}
         </div>
-
-        {isHost && (
-          <div className="flex space-x-2">
-            <button 
-              onClick={() => toggleMic()} 
-              className="p-2 rounded-full hover:bg-gray-700 text-white"
-              title={micOn ? "Mute participant" : "Unmute participant"}
-            >
-              {micOn ? <FiMicOff size={18} /> : <FiMic size={18} />}
-            </button>
-            <button 
-              onClick={() => toggleWebcam()} 
-              className="p-2 rounded-full hover:bg-gray-700 text-white"
-              title={webcamOn ? "Turn off camera" : "Turn on camera"}
-            >
-              {webcamOn ? <FiVideoOff size={18} /> : <FiVideo size={18} />}
-            </button>
-            <button 
-              onClick={() => setShowRemoveConfirmation(true)} 
-              className="p-2 rounded-full hover:bg-gray-700 text-red-500"
-              title="Remove participant"
-            >
-              <FiUserX size={18} />
-            </button>
-          </div>
-        )}
+        <div>
+          <p className="text-sm text-white">
+            {displayName || "Unnamed"} {isLocal ? "(You)" : ""}
+            {isHost && !isLocal && " (Host)"}
+          </p>
+        </div>
       </div>
-
-      {showRemoveConfirmation && (
-        <RemoveParticipantConfirmation 
-          participantId={participantId}
-          displayName={displayName || "Unnamed"}
-          onClose={() => setShowRemoveConfirmation(false)}
+      
+      {!isLocal && localParticipantId && (
+        <div className="flex items-center space-x-3">
+          <span className="text-white text-lg">
+            {micOn ? <FiMic /> : <FiMicOff />}
+          </span>
+          <span className="text-white text-lg">
+            {webcamOn ? <FiVideo /> : <FiVideoOff />}
+          </span>
+          {canControl && (
+            <button
+              onClick={handleRemoveParticipant}
+              className="text-red-500 text-lg"
+            >
+              <FiUserX />
+            </button>
+          )}
+        </div>
+      )}
+      
+      {showConfirmation && (
+        <RemoveParticipantConfirmation
+          participantName={displayName || "this participant"}
+          onCancel={cancelRemoveParticipant}
+          onConfirm={confirmRemoveParticipant}
         />
       )}
-    </>
+    </div>
   );
 };
 
-const ParticipantPanel = () => {
+const ParticipantPanel = ({ panelHeight }) => {
   const { participants } = useMeeting();
   const participantIds = [...participants.keys()];
 
   return (
-    <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 200px)" }}>
-      {participantIds.length > 0 ? (
-        participantIds.map((participantId) => (
-          <ParticipantListItem key={participantId} participantId={participantId} />
-        ))
-      ) : (
-        <p className="text-white text-center p-4">No participants yet</p>
-      )}
+    <div
+      className="overflow-y-auto overflow-x-hidden"
+      style={{ height: panelHeight - 100 }}
+    >
+      <div className="w-full">
+        {participantIds.map((participantId) => (
+          <ParticipantListItem 
+            key={participantId} 
+            participantId={participantId} 
+          />
+        ))}
+      </div>
     </div>
   );
 };
