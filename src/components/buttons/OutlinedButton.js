@@ -114,25 +114,19 @@ export const OutlinedButton = ({
             opacity: blinkingState,
           }}
         >
-          <button
+          <div
+            role="button"
+            tabIndex={0}
             className={`${
               disabled ? "cursor-default" : "cursor-pointer"
             } flex items-center justify-center`}
             id={btnID}
-            onMouseEnter={() => {
-              setMouseOver(true);
-            }}
-            onMouseLeave={() => {
-              setMouseOver(false);
-            }}
-            onMouseDown={() => {
-              setMouseDown(true);
-            }}
-            onMouseUp={() => {
-              setMouseDown(false);
-            }}
-            disabled={disabled}
             onClick={onClick}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                onClick();
+              }
+            }}
           >
             <div
               className="flex items-center justify-center p-1 m-1 rounded-lg"
@@ -203,7 +197,7 @@ export const OutlinedButton = ({
                 {buttonText}
               </p>
             ) : null}
-          </button>
+          </div>
           {typeof renderRightComponent === "function" && renderRightComponent()}
         </div>
       </div>

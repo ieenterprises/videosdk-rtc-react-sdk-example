@@ -871,17 +871,17 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
       <MeetingIdCopyBTN />
 
       <div className="flex flex-1 items-center justify-center" ref={tollTipEl}>
-        <RecordingBTN />
-        <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
-        <MicBTN />
-        <WebCamBTN />
-        <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
-        <PipBTN isMobile={isMobile} isTab={isTab} />
-        <LeaveBTN />
+        <RecordingBTN key="recording-btn" />
+        <RaiseHandBTN key="raise-hand-btn" isMobile={isMobile} isTab={isTab} />
+        <MicBTN key="mic-btn" />
+        <WebCamBTN key="webcam-btn" />
+        <ScreenShareBTN key="screen-share-btn" isMobile={isMobile} isTab={isTab} />
+        <PipBTN key="pip-btn" isMobile={isMobile} isTab={isTab} />
+        <LeaveBTN key="leave-btn" />
       </div>
       <div className="flex items-center justify-center">
-        <ChatBTN isMobile={isMobile} isTab={isTab} />
-        <ParticipantsBTN isMobile={isMobile} isTab={isTab} />
+        <ChatBTN key="chat-btn" isMobile={isMobile} isTab={isTab} />
+        <ParticipantsBTN key="participants-btn" isMobile={isMobile} isTab={isTab} />
       </div>
     </div>
   );
