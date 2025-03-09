@@ -2,6 +2,10 @@ import { CheckIcon, ClipboardIcon } from "@heroicons/react/outline";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
+// Added imports for participant control
+import { useMeeting, useParticipant, usePubSub } from "@videosdk.live/react-sdk";
+
+
 export function MeetingDetailsScreen({
   onClickJoin,
   _handleOnCreateMeeting,
@@ -15,6 +19,20 @@ export function MeetingDetailsScreen({
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);
   const [isJoinMeetingClicked, setIsJoinMeetingClicked] = useState(false);
   const [meetingTitle, setMeetingTitle] = useState("");
+
+  // Added hooks for meeting and participant management
+  const meeting = useMeeting();
+  const participants = meeting?.participants;
+
+
+  const toggleParticipantAudio = (participantId) => {
+    meeting?.toggleParticipantAudio(participantId);
+  };
+
+  const toggleParticipantVideo = (participantId) => {
+    meeting?.toggleParticipantVideo(participantId);
+  };
+
 
   return (
     <div
