@@ -8,40 +8,92 @@ import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { nameTructed } from "../../utils/helper";
 
-function ParticipantListItem({ participantId, raisedHand }) {
-  const { micOn, webcamOn, displayName, isLocal } =
-    useParticipant(participantId);
+const ParticipantListItem = ({ participantId, raisedHand }) => {
+  const { micOn, webcamOn, displayName, isLocal, enableMic, disableMic, enableWebcam, disableWebcam, remove } = useParticipant(
+    participantId
+  );
+  const { localParticipantId } = useMeeting();
+  const isHost = localParticipantId === participantId;
+
+  const handleToggleMic = () => {
+    if (micOn) {
+      disableMic();
+    } else {
+      enableMic();
+    }
+  };
+
+  const handleToggleWebcam = () => {
+    if (webcamOn) {
+      disableWebcam();
+    } else {
+      enableWebcam();
+    }
+  };
+
+  const handleRemoveParticipant = () => {
+    if (window.confirm(`Are you sure you want to remove ${displayName || 'this participant'}?`)) {
+      remove();
+    }
+  };
+
+  // Only show control buttons if you're not the one being controlled
+  const showControls = !isLocal && isHost;
 
   return (
-    <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg mb-0">
-      <div className="flex flex-1 items-center justify-center relative">
-        <div
-          style={{
-            color: "#212032",
-            backgroundColor: "#757575",
-          }}
-          className="h-10 w-10 text-lg mt-0 rounded overflow-hidden flex relative items-center justify-center"
-        >
-          {displayName?.charAt(0).toUpperCase()}
-        </div>
-        <div className="ml-2 mr-1 flex flex-1">
-          <p className="text-base text-white overflow-hidden whitespace-pre-wrap overflow-ellipsis">
+    <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <p className="text-base text-white ml-2">
             {isLocal ? "You" : nameTructed(displayName, 15)}
           </p>
         </div>
-        {raisedHand && (
-          <div className="flex items-center justify-center m-1 p-1">
-            <RaiseHand fillcolor={"#fff"} />
+        <div className="flex items-center justify-center">
+          {raisedHand && (
+            <div className="ml-1 mr-1">
+              <RaiseHand fillcolor="#fff" />
+            </div>
+          )}
+          <div className="ml-1 mr-1">
+            {micOn ? <MicOnIcon fillcolor="#fff" /> : <MicOffIcon />}
           </div>
-        )}
-        <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
-        <div className="m-1 p-1">
-          {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
+          <div className="ml-1 mr-1">
+            {webcamOn ? (
+              <VideoCamOnIcon fillcolor="#fff" />
+            ) : (
+              <VideoCamOffIcon />
+            )}
+          </div>
+
+          {showControls && (
+            <>
+              <button 
+                onClick={handleToggleMic}
+                className="ml-2 px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 rounded text-white"
+              >
+                {micOn ? "Mute" : "Unmute"}
+              </button>
+
+              <button 
+                onClick={handleToggleWebcam}
+                className="ml-2 px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 rounded text-white"
+              >
+                {webcamOn ? "Disable Cam" : "Enable Cam"}
+              </button>
+
+              <button 
+                onClick={handleRemoveParticipant}
+                className="ml-2 px-2 py-1 text-xs bg-red-600 hover:bg-red-700 rounded text-white"
+              >
+                Remove
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
   );
-}
+};
 
 export function ParticipantPanel({ panelHeight }) {
   const { raisedHandsParticipants } = useMeetingAppContext();
