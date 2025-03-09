@@ -1,34 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import { RemoveParticipantConfirmation } from "../RemoveParticipantConfirmation";
 
 export const ParticipantPanel = () => {
   const [selectedParticipantId, setSelectedParticipantId] = useState(null);
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
-  const [isHost, setIsHost] = useState(false);
 
-  const { participants, localParticipantId, meetingId } = useMeeting();
-
-  const participantIds = [...participants.keys()];
-
-  // Determine if local participant is the meeting creator (host)
-  useEffect(() => {
-    // The first person to join a meeting is considered the creator/host
-    // We can check if this was stored in localStorage when meeting was created
-    const storedMeetingData = localStorage.getItem(`meeting_${meetingId}`);
-    if (storedMeetingData) {
-      const meetingData = JSON.parse(storedMeetingData);
-      setIsHost(meetingData.creatorId === localParticipantId);
-    } else if (participantIds.length > 0 && participantIds[0] === localParticipantId) {
-      // If no stored data, assume first person is host
-      setIsHost(true);
-      // Store creator info
-      localStorage.setItem(`meeting_${meetingId}`, JSON.stringify({
-        creatorId: localParticipantId,
-        createdAt: new Date().toISOString()
-      }));
-    }
-  }, [localParticipantId, meetingId, participantIds]);
+  const { participants, localParticipantId } = useMeeting();
 
   const handleRemoveClick = (participantId) => {
     if (participantId) {
@@ -43,6 +21,7 @@ export const ParticipantPanel = () => {
     setShowRemoveConfirmation(false);
   };
 
+  const participantIds = [...participants.keys()];
 
   return (
     <div className="h-full overflow-y-auto p-4">
@@ -51,18 +30,17 @@ export const ParticipantPanel = () => {
         {participantIds.map((participantId) => {
           const participant = participants.get(participantId);
           const isLocal = participantId === localParticipantId;
-          // Mark local user as host - they can't be removed
 
           return (
-            <div
+            <div 
               key={participantId}
               className="flex items-center justify-between rounded bg-gray-700 p-2"
             >
               <span className="text-white">
-                {participant.displayName || (isLocal ? "You" : "Guest")}
+                {participant.displayName || (isLocal ? "You (Host)" : "Guest")}
                 {isLocal && <span className="ml-2 text-xs text-gray-400">(Meeting Host)</span>}
               </span>
-              {!isLocal && isHost && ( // Only show remove button if local user is host
+              {!isLocal && (
                 <button
                   onClick={() => handleRemoveClick(participantId)}
                   className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
