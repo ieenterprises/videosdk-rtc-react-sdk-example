@@ -5,33 +5,39 @@ import { RemoveParticipantConfirmation } from "../RemoveParticipantConfirmation"
 const ParticipantControls = ({ participantId }) => {
   const { micOn, webcamOn, isLocal } = useParticipant(participantId);
   const { toggleRemoteMic, toggleRemoteWebcam } = useMeeting();
+  const isHost = localStorage.getItem("isHost") === "true";
 
   const handleMicToggle = () => {
-    if (!isLocal) {
+    if (!isLocal && isHost) {
+      console.log(`Toggling mic for participant: ${participantId}, current state: ${micOn}`);
       toggleRemoteMic(participantId);
     }
   };
 
   const handleWebcamToggle = () => {
-    if (!isLocal) {
+    if (!isLocal && isHost) {
+      console.log(`Toggling webcam for participant: ${participantId}, current state: ${webcamOn}`);
       toggleRemoteWebcam(participantId);
     }
   };
+
+  // Only allow host to control other participants' media
+  const canControl = isHost && !isLocal;
 
   return (
     <div className="flex space-x-2">
       <button
         onClick={handleMicToggle}
-        disabled={isLocal}
-        className={`p-1 rounded ${isLocal ? 'bg-gray-600' : (micOn ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')}`}
+        disabled={!canControl}
+        className={`p-1 rounded ${!canControl ? 'bg-gray-600' : (micOn ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')}`}
         title={micOn ? "Mute Participant" : "Unmute Participant"}
       >
         <span className="text-xs text-white">{micOn ? "Mic On" : "Mic Off"}</span>
       </button>
       <button
         onClick={handleWebcamToggle}
-        disabled={isLocal}
-        className={`p-1 rounded ${isLocal ? 'bg-gray-600' : (webcamOn ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')}`}
+        disabled={!canControl}
+        className={`p-1 rounded ${!canControl ? 'bg-gray-600' : (webcamOn ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')}`}
         title={webcamOn ? "Turn Off Camera" : "Turn On Camera"}
       >
         <span className="text-xs text-white">{webcamOn ? "Cam On" : "Cam Off"}</span>
@@ -43,6 +49,7 @@ const ParticipantControls = ({ participantId }) => {
 export const ParticipantPanel = ({ panelHeight }) => {
   const [selectedParticipantId, setSelectedParticipantId] = useState(null);
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
+  const { meetingId } = useMeeting();
 
   const { participants, localParticipantId } = useMeeting();
 

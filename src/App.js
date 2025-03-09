@@ -29,7 +29,7 @@ function App() {
         return "Are you sure you want to exit?";
       };
     }
-    
+
     // Check for meetingId in URL params when app loads
     const urlParams = new URLSearchParams(window.location.search);
     const meetingIdParam = urlParams.get('meetingId');
@@ -42,7 +42,7 @@ function App() {
     <>
       {/* Only show TawkToChat when not in a meeting and not on leave screen */}
       <TawkToChat isVisible={!isMeetingStarted && !isMeetingLeft} />
-      
+
       <MeetingAppProvider>
         {isMeetingStarted ? (
 
@@ -54,7 +54,13 @@ function App() {
               name: participantName ? participantName : "TestUser",
               multiStream: true,
               customCameraVideoTrack: customVideoStream,
-              customMicrophoneAudioTrack: customAudioStream
+              customMicrophoneAudioTrack: customAudioStream,
+              permissions: { // Added permissions for remote control
+                allowRemoteMute: true,
+                canRemoveOtherParticipant: true,
+                toggleParticipantWebcam: true,
+                toggleParticipantMic: true
+              }
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
@@ -68,21 +74,21 @@ function App() {
                 setWebcamOn(false);
                 setMicOn(false);
                 setMeetingStarted(false);
-                
+
                 // Clean up any Tawk.to elements that might be present
                 const tawkContainer = document.getElementById('tawk_6616a163a0c6737bd12a56c8');
                 if (tawkContainer) {
                   tawkContainer.remove();
                 }
-                
+
                 // Remove any Tawk.to scripts
                 const tawkScripts = document.querySelectorAll('script[src*="tawk.to"]');
                 tawkScripts.forEach(script => script.remove());
-                
+
                 // Remove Tawk iframe and widget elements
                 const tawkIframes = document.querySelectorAll('iframe[src*="tawk.to"]');
                 tawkIframes.forEach(iframe => iframe.remove());
-                
+
                 const tawkWidgets = document.querySelectorAll('.tawk-min-container, .tawk-card, .tawk-chat-panel');
                 tawkWidgets.forEach(widget => widget.remove());
               }}
