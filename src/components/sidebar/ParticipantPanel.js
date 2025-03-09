@@ -1,5 +1,5 @@
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import MicOffIcon from "../../icons/ParticipantTabPanel/MicOffIcon";
 import MicOnIcon from "../../icons/ParticipantTabPanel/MicOnIcon";
 import RaiseHand from "../../icons/ParticipantTabPanel/RaiseHand";
@@ -7,38 +7,107 @@ import VideoCamOffIcon from "../../icons/ParticipantTabPanel/VideoCamOffIcon";
 import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { nameTructed } from "../../utils/helper";
+import { 
+  FaMicrophone, 
+  FaMicrophoneSlash, 
+  FaVideo, 
+  FaVideoSlash,
+  FaSignOutAlt
+} from "react-icons/fa";
+import { RemoveParticipantConfirmation } from "../../components/RemoveParticipantConfirmation";
 
 function ParticipantListItem({ participantId, raisedHand }) {
-  const { micOn, webcamOn, displayName, isLocal } =
-    useParticipant(participantId);
+  const { participant, removeParticipant, enableMic, disableMic, enableWebcam, disableWebcam } = useParticipant(participantId);
+  const { micOn, webcamOn, isLocal, displayName } = participant;
+  const { localParticipant } = useMeeting();
+  const isAdmin = localParticipant?.isHost || localParticipant?.presenterId;
+  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
+  const isHost = participant?.isHost;
+
+  const handleRemoveParticipant = () => {
+    if (isAdmin && !isLocal) {
+      setShowRemoveConfirmation(true);
+    }
+  };
+
+  const confirmRemoveParticipant = () => {
+    removeParticipant();
+    setShowRemoveConfirmation(false);
+  };
+
+  const cancelRemoveParticipant = () => {
+    setShowRemoveConfirmation(false);
+  };
+
+  const handleToggleMic = () => {
+    if (isAdmin && !isLocal) {
+      micOn ? disableMic() : enableMic();
+    }
+  };
+
+  const handleToggleWebcam = () => {
+    if (isAdmin && !isLocal) {
+      webcamOn ? disableWebcam() : enableWebcam();
+    }
+  };
 
   return (
     <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg mb-0">
-      <div className="flex flex-1 items-center justify-center relative">
-        <div
-          style={{
-            color: "#212032",
-            backgroundColor: "#757575",
-          }}
-          className="h-10 w-10 text-lg mt-0 rounded overflow-hidden flex relative items-center justify-center"
-        >
-          {displayName?.charAt(0).toUpperCase()}
+      <div className="flex flex-1 items-center justify-between">
+        <div className="flex items-center">
+          <p className="text-base text-white">{displayName}</p>
+          {isLocal && <span className="ml-2 text-xs text-gray-400">(You)</span>}
+          {isHost && <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">Host</span>}
         </div>
-        <div className="ml-2 mr-1 flex flex-1">
-          <p className="text-base text-white overflow-hidden whitespace-pre-wrap overflow-ellipsis">
-            {isLocal ? "You" : nameTructed(displayName, 15)}
-          </p>
-        </div>
-        {raisedHand && (
-          <div className="flex items-center justify-center m-1 p-1">
-            <RaiseHand fillcolor={"#fff"} />
-          </div>
-        )}
-        <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
-        <div className="m-1 p-1">
-          {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
+        <div className="flex items-center">
+          {micOn ? (
+            <FaMicrophone size={20} className="text-white" />
+          ) : (
+            <FaMicrophoneSlash size={20} className="text-white" />
+          )}
+          {webcamOn ? (
+            <FaVideo size={20} className="text-white ml-1" />
+          ) : (
+            <FaVideoSlash size={20} className="text-white ml-1" />
+          )}
+
+          {isAdmin && !isLocal && (
+            <div className="flex ml-2">
+              <button 
+                onClick={handleToggleMic} 
+                className="p-1 bg-gray-600 rounded-md mx-1 hover:bg-gray-500 transition-colors duration-200"
+                title={micOn ? "Mute participant" : "Unmute participant"}
+                aria-label={micOn ? "Mute participant" : "Unmute participant"}
+              >
+                {micOn ? <FaMicrophoneSlash size={14} className="text-red-500" /> : <FaMicrophone size={14} className="text-green-500" />}
+              </button>
+              <button 
+                onClick={handleToggleWebcam} 
+                className="p-1 bg-gray-600 rounded-md mx-1 hover:bg-gray-500 transition-colors duration-200"
+                title={webcamOn ? "Turn off participant camera" : "Turn on participant camera"}
+                aria-label={webcamOn ? "Turn off participant camera" : "Turn on participant camera"}
+              >
+                {webcamOn ? <FaVideoSlash size={14} className="text-red-500" /> : <FaVideo size={14} className="text-green-500" />}
+              </button>
+              <button 
+                onClick={handleRemoveParticipant} 
+                className="p-1 bg-red-600 rounded-md ml-1 hover:bg-red-700 transition-colors duration-200"
+                title="Remove participant from meeting"
+                aria-label="Remove participant from meeting"
+              >
+                <FaSignOutAlt size={14} className="text-white" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
+      {showRemoveConfirmation && (
+        <RemoveParticipantConfirmation
+          participantName={displayName}
+          onConfirm={confirmRemoveParticipant}
+          onCancel={cancelRemoveParticipant}
+        />
+      )}
     </div>
   );
 }
@@ -101,6 +170,7 @@ export function ParticipantPanel({ panelHeight }) {
           const { raisedHand, participantId: peerId } = part[index];
           return (
             <ParticipantListItem
+              key={peerId}
               participantId={peerId}
               raisedHand={raisedHand}
             />
