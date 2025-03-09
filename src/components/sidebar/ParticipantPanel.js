@@ -30,6 +30,7 @@ export const ParticipantPanel = () => {
         {participantIds.map((participantId) => {
           const participant = participants.get(participantId);
           const isLocal = participantId === localParticipantId;
+          // Mark local user as host - they can't be removed
 
           return (
             <div 
@@ -37,10 +38,10 @@ export const ParticipantPanel = () => {
               className="flex items-center justify-between rounded bg-gray-700 p-2"
             >
               <span className="text-white">
-                {participant.displayName || (isLocal ? "You (Host)" : "Guest")}
+                {participant.displayName || (isLocal ? "You" : "Guest")}
                 {isLocal && <span className="ml-2 text-xs text-gray-400">(Meeting Host)</span>}
               </span>
-              {!isLocal && participant.displayName !== "You" && (
+              {!isLocal && (
                 <button
                   onClick={() => handleRemoveClick(participantId)}
                   className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
