@@ -3,12 +3,17 @@ import React from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 
 export const RemoveParticipantConfirmation = ({ participantId, onClose }) => {
-  const { remove } = useMeeting();
+  const meeting = useMeeting();
 
   const handleParticipantRemove = () => {
-    if (participantId) {
-      remove(participantId);
-      onClose();
+    if (participantId && meeting) {
+      try {
+        meeting.remove(participantId);
+        console.log("Removing participant:", participantId);
+        onClose();
+      } catch (err) {
+        console.error("Error removing participant:", err);
+      }
     }
   };
 

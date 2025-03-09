@@ -22,30 +22,25 @@ export const ParticipantPanel = () => {
   const participantIds = [...participants.keys()];
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex flex-1 flex-col overflow-y-auto">
+    <div className="h-full overflow-y-auto p-4">
+      <h2 className="mb-4 text-lg font-semibold">Participants ({participantIds.length})</h2>
+      <div className="flex flex-col space-y-2">
         {participantIds.map((participantId) => {
           const participant = participants.get(participantId);
           const isLocal = participantId === localParticipantId;
           
           return (
-            <div
+            <div 
               key={participantId}
-              className="my-1 flex items-center justify-between rounded p-2 hover:bg-gray-700"
+              className="flex items-center justify-between rounded bg-gray-700 p-2"
             >
-              <div className="flex items-center">
-                <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
-                  {participant.displayName?.charAt(0) || "U"}
-                </div>
-                <div className="ml-2 font-medium">
-                  {participant.displayName || "Unnamed"} {isLocal ? "(You)" : ""}
-                </div>
-              </div>
-              
+              <span className="text-white">
+                {participant.displayName || (isLocal ? "You (Host)" : "Guest")}
+              </span>
               {!isLocal && (
                 <button
                   onClick={() => handleRemoveClick(participantId)}
-                  className="rounded bg-red-500 px-2 py-1 text-white text-sm"
+                  className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
                 >
                   Remove
                 </button>
@@ -56,11 +51,13 @@ export const ParticipantPanel = () => {
       </div>
       
       {showRemoveConfirmation && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 p-4 rounded shadow-lg z-10">
-          <RemoveParticipantConfirmation
-            participantId={selectedParticipantId}
-            onClose={handleCloseConfirmation}
-          />
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="w-96 rounded bg-gray-800 p-4 text-white">
+            <RemoveParticipantConfirmation
+              participantId={selectedParticipantId}
+              onClose={handleCloseConfirmation}
+            />
+          </div>
         </div>
       )}
     </div>
