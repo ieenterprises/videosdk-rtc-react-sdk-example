@@ -37,10 +37,12 @@ export const ParticipantPanel = () => {
               className="flex items-center justify-between rounded bg-gray-700 p-2"
             >
               <span className="text-white">
-                {participant.displayName || (isLocal ? "You (Host)" : "Guest")}
-                {isLocal && <span className="ml-2 text-xs text-gray-400">(Meeting Host)</span>}
+                {participant.displayName || (isLocal ? "You" : "Guest")}
+                {localStorage.getItem("isHost") === "true" && isLocal && 
+                  <span className="ml-2 text-xs text-gray-400">(Meeting Host)</span>}
               </span>
-              {!isLocal && (
+              {/* Only show remove button to host and only for non-host participants */}
+              {!isLocal && localStorage.getItem("isHost") === "true" && (
                 <button
                   onClick={() => handleRemoveClick(participantId)}
                   className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"

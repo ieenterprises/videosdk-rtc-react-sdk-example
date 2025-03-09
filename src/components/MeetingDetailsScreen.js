@@ -43,7 +43,7 @@ export function MeetingDetailsScreen({
               )}
             </button>
           </div>
-          
+
           <div className="border border-solid border-gray-400 rounded-xl px-4 py-3 bg-white flex items-center justify-center">
             <p className="text-black text-base font-medium">
               {`Meeting link: ${window.location.origin}?meetingId=${meetingId}`}
@@ -67,7 +67,7 @@ export function MeetingDetailsScreen({
               <ClipboardIcon className="h-5 w-5 text-gray-700" />
             </button>
           </div>
-          
+
           <button
             className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-2"
             onClick={() => {
@@ -91,7 +91,7 @@ export function MeetingDetailsScreen({
           {meetingIdError && (
             <p className="text-xs text-red-600">{`Please enter valid meetingId`}</p>
           )}
-          
+
           <button
             className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-2"
             onClick={() => {
@@ -133,6 +133,16 @@ export function MeetingDetailsScreen({
                 onClickStartMeeting(meetingTitle);
               } else {
                 if (meetingId.match("\\w{4}\\-\\w{4}\\-\\w{4}")) {
+                  setMeetingIdError(false);
+                  // Set a flag in localStorage to identify this user joined as a participant
+                  localStorage.setItem("joinedMeetingId", meetingId);
+                  if (localStorage.getItem("hostMeetingId") === meetingId) {
+                    // User is joining their own meeting
+                    localStorage.setItem("isHost", "true");
+                  } else {
+                    // User is joining someone else's meeting
+                    localStorage.setItem("isHost", "false");
+                  }
                   onClickJoin(meetingId);
                 } else setMeetingIdError(true);
               }
@@ -150,10 +160,12 @@ export function MeetingDetailsScreen({
               className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
               onClick={async (e) => {
                 const { meetingId, err } = await _handleOnCreateMeeting();
-              
+
                 if (meetingId) {
                   setMeetingId(meetingId);
                   setIscreateMeetingClicked(true);
+                  localStorage.setItem("hostMeetingId", meetingId); // Store the host's meeting ID
+                  localStorage.setItem("isHost", "true"); //Mark the host
                 } else {
                   toast(
                     `${err}`,
