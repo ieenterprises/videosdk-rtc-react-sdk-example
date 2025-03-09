@@ -1,26 +1,31 @@
 
 import React from "react";
+import { useMeeting } from "@videosdk.live/react-sdk";
 
-export const RemoveParticipantConfirmation = ({ participantId, onConfirm, onClose }) => {
+export const RemoveParticipantConfirmation = ({ participantId, onClose }) => {
+  const { remove } = useMeeting();
+
+  const handleParticipantRemove = () => {
+    if (participantId) {
+      remove(participantId);
+      onClose();
+    }
+  };
+
   return (
-    <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
-      <h3 className="text-white text-lg font-medium mb-2">Remove Participant</h3>
-      <p className="text-gray-300 mb-4">
-        Are you sure you want to remove this participant?
-      </p>
-      <div className="flex justify-end space-x-2">
+    <div className="flex flex-col">
+      <h2 className="mb-4 text-lg font-bold">Remove Participant</h2>
+      <p className="mb-4">Are you sure you want to remove this participant?</p>
+      <div className="flex flex-row items-center justify-end">
         <button
-          className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+          className="mr-2 rounded bg-gray-300 px-4 py-2 text-black"
           onClick={onClose}
         >
           Cancel
         </button>
         <button
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          onClick={() => {
-            onConfirm(participantId);
-            onClose();
-          }}
+          className="rounded bg-red-500 px-4 py-2 text-white"
+          onClick={handleParticipantRemove}
         >
           Remove
         </button>

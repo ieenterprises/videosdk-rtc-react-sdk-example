@@ -1,78 +1,68 @@
-import React, { useMemo } from "react";
+
+import React, { useState } from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import { RemoveParticipantConfirmation } from "../RemoveParticipantConfirmation";
 
-const ParticipantListItem = ({ participantId, isHost }) => {
-  const { participants } = useMeeting();
-  const participant = useMemo(
-    () => participants.get(participantId),
-    [participants, participantId]
-  );
-
-  const { displayName } = participant;
-
-  const { removeParticipant } = useMeeting();
-
-  const handleRemoveParticipant = () => {
-    if (isHost && participantId !== isHost) {
-      removeParticipant(participantId);
-    }
+export const ParticipantPanel = () => {
+  const [selectedParticipantId, setSelectedParticipantId] = useState(null);
+  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
+  
+  const { participants, localParticipantId } = useMeeting();
+  
+  const handleRemoveClick = (participantId) => {
+    setSelectedParticipantId(participantId);
+    setShowRemoveConfirmation(true);
+  };
+  
+  const handleCloseConfirmation = () => {
+    setShowRemoveConfirmation(false);
+    setSelectedParticipantId(null);
   };
 
+  const participantIds = [...participants.keys()];
+
   return (
-    <div
-      className="mt-2 m-1 p-2 bg-gray-700 rounded-lg mb-0"
-      key={`participant_${participantId}`}
-    >
-      <div className="flex flex-1 items-center justify-between">
-        <div className="flex items-center">
-          <p className="text-base text-white">{displayName || participantId}</p>
-        </div>
-        <div className="flex items-center justify-center">
-          {isHost && participantId !== isHost && (
-            <button
-              className="text-white bg-red-500 p-1 mx-1 rounded hover:bg-red-600"
-              onClick={handleRemoveParticipant}
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        {participantIds.map((participantId) => {
+          const participant = participants.get(participantId);
+          const isLocal = participantId === localParticipantId;
+          
+          return (
+            <div
+              key={participantId}
+              className="my-1 flex items-center justify-between rounded p-2 hover:bg-gray-700"
             >
-              Remove
-            </button>
-          )}
-        </div>
+              <div className="flex items-center">
+                <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
+                  {participant.displayName?.charAt(0) || "U"}
+                </div>
+                <div className="ml-2 font-medium">
+                  {participant.displayName || "Unnamed"} {isLocal ? "(You)" : ""}
+                </div>
+              </div>
+              
+              {!isLocal && (
+                <button
+                  onClick={() => handleRemoveClick(participantId)}
+                  className="rounded bg-red-500 px-2 py-1 text-white text-sm"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
+      
+      {showRemoveConfirmation && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 p-4 rounded shadow-lg z-10">
+          <RemoveParticipantConfirmation
+            participantId={selectedParticipantId}
+            onClose={handleCloseConfirmation}
+          />
+        </div>
+      )}
     </div>
   );
 };
-
-export function ParticipantPanel({ panelHeight }) {
-  const mMeeting = useMeeting();
-  const { localParticipant, participants } = mMeeting;
-
-  const participantIds = useMemo(() => {
-    const localId = localParticipant?.id;
-    const remoteIds = [...participants.keys()].filter(
-      (id) => id !== localId
-    );
-    return [localId, ...remoteIds].filter(Boolean);
-  }, [participants, localParticipant]);
-
-  return (
-    <div
-      className="overflow-y-auto overflow-x-hidden"
-      style={{ height: panelHeight - 14 }}
-    >
-      <div className="flex flex-col justify-between h-full">
-        <div>
-          {participantIds.map((participantId) => {
-            return (
-              <ParticipantListItem 
-                key={participantId}
-                participantId={participantId}
-                isHost={localParticipant?.id}
-              />
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
