@@ -3,11 +3,11 @@ import React from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 
 export const RemoveParticipantConfirmation = ({ participantId, onClose }) => {
-  const meeting = useMeeting();
+  const { remove } = useMeeting();
 
   const handleParticipantRemove = () => {
-    if (participantId && meeting) {
-      meeting.remove(participantId);
+    if (participantId) {
+      remove(participantId);
       onClose();
     }
   };
