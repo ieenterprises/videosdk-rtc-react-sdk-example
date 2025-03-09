@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import { RemoveParticipantConfirmation } from "../RemoveParticipantConfirmation";
@@ -6,17 +5,20 @@ import { RemoveParticipantConfirmation } from "../RemoveParticipantConfirmation"
 export const ParticipantPanel = () => {
   const [selectedParticipantId, setSelectedParticipantId] = useState(null);
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
-  
+
   const { participants, localParticipantId } = useMeeting();
-  
+
   const handleRemoveClick = (participantId) => {
-    setSelectedParticipantId(participantId);
-    setShowRemoveConfirmation(true);
+    if (participantId) {
+      console.log("Selected participant for removal:", participantId);
+      setSelectedParticipantId(participantId);
+      setShowRemoveConfirmation(true);
+    }
   };
-  
+
   const handleCloseConfirmation = () => {
-    setShowRemoveConfirmation(false);
     setSelectedParticipantId(null);
+    setShowRemoveConfirmation(false);
   };
 
   const participantIds = [...participants.keys()];
@@ -28,7 +30,7 @@ export const ParticipantPanel = () => {
         {participantIds.map((participantId) => {
           const participant = participants.get(participantId);
           const isLocal = participantId === localParticipantId;
-          
+
           return (
             <div 
               key={participantId}
@@ -49,7 +51,7 @@ export const ParticipantPanel = () => {
           );
         })}
       </div>
-      
+
       {showRemoveConfirmation && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="w-96 rounded bg-gray-800 p-4 text-white">
