@@ -38,6 +38,7 @@ export const ParticipantPanel = () => {
             >
               <span className="text-white">
                 {participant.displayName || (isLocal ? "You (Host)" : "Guest")}
+                {isLocal && <span className="ml-2 text-xs text-gray-400">(Meeting Host)</span>}
               </span>
               {!isLocal && (
                 <button
