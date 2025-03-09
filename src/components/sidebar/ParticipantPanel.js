@@ -40,7 +40,7 @@ export const ParticipantPanel = () => {
                 {participant.displayName || (isLocal ? "You (Host)" : "Guest")}
                 {isLocal && <span className="ml-2 text-xs text-gray-400">(Meeting Host)</span>}
               </span>
-              {!isLocal && (
+              {!isLocal && participant.displayName !== "You" && (
                 <button
                   onClick={() => handleRemoveClick(participantId)}
                   className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
