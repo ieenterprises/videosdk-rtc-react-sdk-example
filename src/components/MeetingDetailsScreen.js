@@ -152,6 +152,11 @@ export function MeetingDetailsScreen({
                 const { meetingId, err } = await _handleOnCreateMeeting();
               
                 if (meetingId) {
+                  // Mark this user as the creator of this meeting
+                  const creatorInfo = {
+                    createdAt: new Date().toISOString()
+                  };
+                  localStorage.setItem(`meeting_${meetingId}_creator`, JSON.stringify(creatorInfo));
                   setMeetingId(meetingId);
                   setIscreateMeetingClicked(true);
                 } else {

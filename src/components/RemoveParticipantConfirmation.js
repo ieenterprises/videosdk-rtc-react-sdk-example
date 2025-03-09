@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 
@@ -7,22 +6,22 @@ export const RemoveParticipantConfirmation = ({ participantId, onClose }) => {
 
   const handleParticipantRemove = () => {
     if (participantId && participants) {
-      try {
-        // Get the specific participant object
         const participant = participants.get(participantId);
-        
+
         if (participant) {
-          // The VideoSDK provides a remove() method on participant objects
-          console.log("Removing participant:", participantId);
-          participant.remove();
+          try {
+            // The VideoSDK provides a remove() method on participant objects
+            console.log("Removing participant:", participantId);
+            // This is the proper way to remove a participant using VideoSDK
+            participant.remove();
+          } catch (error) {
+            console.error("Error removing participant:", error);
+          }
         } else {
           console.error("Participant not found:", participantId);
         }
         onClose();
-      } catch (err) {
-        console.error("Error removing participant:", err);
       }
-    }
   };
 
   return (
