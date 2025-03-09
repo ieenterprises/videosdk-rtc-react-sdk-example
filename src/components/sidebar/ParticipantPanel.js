@@ -1,8 +1,46 @@
-import React, { useState } from "react";
-import { useMeeting } from "@videosdk.live/react-sdk";
+import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
+import { useEffect, useMemo, useState } from "react";
 import { RemoveParticipantConfirmation } from "../RemoveParticipantConfirmation";
 
-export const ParticipantPanel = () => {
+const ParticipantControls = ({ participantId }) => {
+  const { micOn, webcamOn, isLocal } = useParticipant(participantId);
+  const { toggleRemoteMic, toggleRemoteWebcam } = useMeeting();
+
+  const handleMicToggle = () => {
+    if (!isLocal) {
+      toggleRemoteMic(participantId);
+    }
+  };
+
+  const handleWebcamToggle = () => {
+    if (!isLocal) {
+      toggleRemoteWebcam(participantId);
+    }
+  };
+
+  return (
+    <div className="flex space-x-2">
+      <button
+        onClick={handleMicToggle}
+        disabled={isLocal}
+        className={`p-1 rounded ${isLocal ? 'bg-gray-600' : (micOn ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')}`}
+        title={micOn ? "Mute Participant" : "Unmute Participant"}
+      >
+        <span className="text-xs text-white">{micOn ? "Mic On" : "Mic Off"}</span>
+      </button>
+      <button
+        onClick={handleWebcamToggle}
+        disabled={isLocal}
+        className={`p-1 rounded ${isLocal ? 'bg-gray-600' : (webcamOn ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')}`}
+        title={webcamOn ? "Turn Off Camera" : "Turn On Camera"}
+      >
+        <span className="text-xs text-white">{webcamOn ? "Cam On" : "Cam Off"}</span>
+      </button>
+    </div>
+  );
+};
+
+export const ParticipantPanel = ({ panelHeight }) => {
   const [selectedParticipantId, setSelectedParticipantId] = useState(null);
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
 
@@ -41,15 +79,17 @@ export const ParticipantPanel = () => {
                 {localStorage.getItem("isHost") === "true" && isLocal && 
                   <span className="ml-2 text-xs text-gray-400">(Meeting Host)</span>}
               </span>
-              {/* Only show remove button to host and only for non-host participants */}
-              {!isLocal && localStorage.getItem("isHost") === "true" && (
-                <button
-                  onClick={() => handleRemoveClick(participantId)}
-                  className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
-                >
-                  Remove
-                </button>
-              )}
+              <div className="flex items-center space-x-2">
+                <ParticipantControls participantId={participantId} />
+                {!isLocal && localStorage.getItem("isHost") === "true" && (
+                  <button
+                    onClick={() => handleRemoveClick(participantId)}
+                    className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}
