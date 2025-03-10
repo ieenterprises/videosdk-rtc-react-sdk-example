@@ -573,6 +573,9 @@ export function JoiningScreen({
               <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
                 <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
                   <div className="bg-indigo-800 p-8 rounded-md shadow-lg mb-6 text-center max-w-lg w-full">
+                    <div className="flex flex-col items-center mb-4">
+                      <img src="/company-logo.ico" alt="Company Logo" className="w-16 h-16 mb-3" />
+                    </div>
                     <h2 className="text-3xl font-bold text-white mb-2">Welcome to ieVidMeet</h2>
                     <p className="text-white text-sm mb-6">
                       Seamless HD video calls, crystal-clear audio, secure meetings, and real-time collaboration.
